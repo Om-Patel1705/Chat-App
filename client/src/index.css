@@ -98,3 +98,17 @@ Input{
 ::-webkit-scrollbar-thumb:hover {
   background: #555;
 }
+
+.lol{
+ overflow: scroll;
+}
+
+
+.photo{
+  position: absolute;
+  right: 25px;
+}
+
+.llll{
+  object-fit: cover;
+}

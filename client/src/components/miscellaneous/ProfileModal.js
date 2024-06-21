@@ -14,6 +14,8 @@ import {
   Image,
 } from "@chakra-ui/react";
 
+import "../../index.css";
+
 const ProfileModal = ({ user, children }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
@@ -33,7 +35,7 @@ const ProfileModal = ({ user, children }) => {
             d="flex"
             justifyContent="center"
           >
-            {user.name}
+            {user.username}
           </ModalHeader>
           <ModalCloseButton />
           <ModalBody
@@ -43,10 +45,11 @@ const ProfileModal = ({ user, children }) => {
             justifyContent="space-between"
           >
             <Image
+            className="llll"
               borderRadius="full"
               boxSize="150px"
               src={user.pic}
-              alt={user.name}
+              alt={user.username}
             />
             <Text
               fontSize={{ base: "28px", md: "30px" }}

@@ -192,17 +192,39 @@ const removeFromGroup = async (req, res) => {
   }
 };
 
+
+const fun = async (row) =>{
+
+return await pool.query(`SELECT * FROM chat_users_junction as j join users as u on j.id = u.id where j.chatid=${row.chatid}`);
+     
+}
 const listout = async (req, res) => {
   const chatID  = req.body;
   // console.log(chatID);
   try {
     const list = await pool.query(
-      `select * from chat_users_junction as j natural join chat as c where j.id=${chatID.user._id}`
+      `SELECT u2.username,r1.* from (select chatid,chatname,isgroup,groupadmin,latestmessage,senderid as id, content,time from chat_users_junction as j natural join chat as c join messages as m on m.id=c.latestmessage  where j.id=${chatID.user._id}) as r1 NATURAL join users as u2`
     );
+
+    const arr = [];
+
+    for (const row of list.rows) {
+      const user =  fun(row);
+      row.users=(await user).rows;
+     
+    }
+
+
+    console.log("||")
+    list.rows.forEach((row) => {
+     
+      console.log(row);
+      
+    });
+
+    console.log("||")
+
     // console.log("List of users:");
-    // list.rows.forEach((row) => {
-    //   console.log(row);
-    // });
     res.status(200).json(list.rows);
 
 
