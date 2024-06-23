@@ -12,11 +12,12 @@ import "../index.css"
 import { Button } from "@chakra-ui/react";
 import { ChatState } from "../context/chatProvider.js";
 import { Getsender, GetsenderFull } from "./config/ChatLogics.js";
+import GroupChatModal from "./miscellaneous/GroupChatModal.js";
 const MyChats = ({ fetchAgain }) => {
   const you = "You";
   const [loggedUser, setLoggedUser] = useState();
   const [Image1, seIm] = useState(
-    "https://lumiere-a.akamaihd.net/v1/images/a_avatarpandorapedia_neytiri_16x9_1098_01_0e7d844a.jpeg?region=0%2C0%2C1920%2C1080"
+    "https://cdn6.aptoide.com/imgs/1/2/2/1221bc0bdd2354b42b293317ff2adbcf_icon.png?w=128"
   );
   const { selectedChat, setSelectedChat, user, chats, setChats } = ChatState();
   const [chatnames, setChatnames] = useState([]);
@@ -51,6 +52,7 @@ const MyChats = ({ fetchAgain }) => {
   };
 
   const listUsers = async () => {
+
     try {
       const response = await fetch("http://localhost:3001/api/chat/listout", {
         method: "POST",
@@ -61,23 +63,30 @@ const MyChats = ({ fetchAgain }) => {
         body: JSON.stringify({ user }),
       });
       const data = await response.json();
-      // console.log(data);
+       console.log(data);
       startTransition(() => {
         setChatnames(data);
         setChats(data);
+
       });
     } catch (error) {
+      
       console.error("Error fetching chatnames:", error);
+      toast({
+        title: "Error Occured!",
+        description: "Failed to Load the chats",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+        position: "bottom-left",
+      });
     }
   };
 
   useEffect(() => {
-    if (user) {
-      // console.log(user);
-
-      listUsers(user); // Assuming chatID is available in the user object
-    }
-  }, [user]);
+    setLoggedUser(user);
+    listUsers();
+  }, [fetchAgain,user]);
 
   return (
     <Box
@@ -101,15 +110,15 @@ const MyChats = ({ fetchAgain }) => {
         alignItems="center"
       >
         My Chats
-        {/* <GroupChatModal>
+        <GroupChatModal>
           <Button
-            d="flex"
+            display="flex"
             fontSize={{ base: "17px", md: "10px", lg: "17px" }}
             rightIcon={<AddIcon />}
           >
             New Group Chat
           </Button>
-        </GroupChatModal> */}
+        </GroupChatModal>
         {/* <ul>
           {chatnames.map((chat, index) => (
             <li key={index}>{chat.chatname}</li>
@@ -173,8 +182,8 @@ const MyChats = ({ fetchAgain }) => {
                           )}{" "}
                           :{" "}
                         </b>
-                        {chat.content.length > 50
-                          ? chat.content.substring(0, 51) + "..."
+                        {chat.content.length > 30
+                          ? chat.content.substring(0, 30) + "..."
                           : chat.content}
                       </Text>
                     )}

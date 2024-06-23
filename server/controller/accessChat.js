@@ -1,3 +1,4 @@
+const { common } = require("@mui/material/colors");
 const pool = require("../config/db");
 
 const accessChat = async (req, res) => {
@@ -66,9 +67,9 @@ const fetchChats = async (req, res) => {
   try {
     const userID = req.body;
 
-    // console.log("userID");
-    // console.log(userID);
-    // console.log("userID");
+    console.log("userID");
+    console.log(userID);
+    console.log("userID");
     const data = await pool.query(
       `select c.* from  chat_users_junction as cuj  join chat as c on c.chatid = cuj.chatid  where id=${req.body._id}`
     );
@@ -85,32 +86,62 @@ const createGroup = async (req, res) => {
     return res.status(400).json({ message: "Please Fill all the feilds" });
   }
 
-  var users = JSON.parse(req.body.users);
+  req.body.admin.id=req.body.admin._id;
+  req.body.admin.username=req.body.admin.name;
+  var users = req.body.users;
+  users.push(req.body.admin);
 
-  if (users.length < 2) {
-    return res
-      .status(400)
-      .json({ message: "Require atleast 2 users to create a chat" });
-  }
+  var temp = users[0];
+  users[0] = users[users.length - 1];
+  users[users.length - 1] = temp;
+
 
   try {
-    const returnChat = await pool.query(
-      `insert into chat (chatname,isgroup,groupadmin) values ('${req.body.name}',true,${req.user.id})  RETURNING chatid;`
+
+    const msgid = await pool.query(
+      `insert into messages (senderid,content,time) values (${req.body.admin._id},'Thala for a reason',current_timestamp)  RETURNING id;`
     );
+
+      console.log(msgid.rows[0]);
+
+
+    const returnChat = await pool.query(
+      `insert into chat (chatname,isgroup,groupadmin,latestmessage) values ('${req.body.name}',true,${req.body.admin._id},${msgid.rows[0].id})  RETURNING chatid;`
+    );
+
+    // const returnChat = await pool.query(
+    //   `insert into chat (chatname,isgroup,groupadmin,latestmessage) values ('${req.body.name}',true,${req.body.admin._id},${msgid.rows[0].id})  RETURNING chatid;`
+    // );
+
+    
+    
     const newChat = returnChat.rows[0].chatid;
-    console.log(newChat);
+    // console.log(newChat);
+   
     var r = "";
-    for (var i = 0; i <= users.length; i++) {
-      if (i != users.length) {
-        r = r + `(${users[i]},${newChat}),`;
+    for (var i = 0; i < users.length; i++) {
+      if(i==0){
+        r = r + `(${users[i]._id},${newChat}),`;
+      }
+      else if (i != users.length-1) {
+        r = r + `(${users[i].id},${newChat}),`;
       } else {
-        r = r + `(${req.user.id},${newChat})`;
+        r = r + `(${users[i].id},${newChat})`;
       }
     }
 
+    // console.log(r);
+ 
+
     await pool.query(`insert into chat_users_junction (id,chatid) values ${r}`);
 
-    return res.json(newChat);
+    const data = await pool.query(`SELECT u2.username,r1.* from (select chatid,chatname,isgroup,groupadmin,latestmessage,senderid as id, content,time from chat_users_junction as j natural join chat as c right join messages as m on m.id=c.latestmessage  where j.id=${req.body.admin.id}) as r1 NATURAL join users as u2`);
+
+    data.rows[0].users = users;
+
+   console.log(data.rows);
+
+    return res.json(data.rows[0]);
   } catch (error) {
     console.log(error);
     return res.json(error);
@@ -118,21 +149,26 @@ const createGroup = async (req, res) => {
 };
 
 const renameGroup = async (req, res) => {
-  const { chatId, newName } = req.body;
+  const { oldchat, newName } = req.body;
 
-  if (!chatId || !newName) {
+  console.log("Rename");
+
+  if (!oldchat.chatid || !newName) {
     console.log("Please fill all the feiled");
     return res.status(400).json({ message: "Please fill all the feiled" });
   }
   try {
     const updatedName = await pool.query(
-      `update chat set chatname = '${newName}' where chatid=${chatId} returning chatname`
+      `update chat set chatname = '${newName}' where chatid=${oldchat.chatid} returning chatname`
     );
-    console.log(updatedName.rows[0]);
-    res.status(200).json({
-      message: "Group name is successfully updated",
-      newName: `${updatedName.rows[0].chatname}`,
-    });
+
+    const updatedChat = await pool.query(
+      `select * from chat where chatid=${oldchat.chatid}`
+    );
+
+    updatedChat.rows[0].users = oldchat.users;
+    console.log(updatedChat.rows[0]);
+    res.status(200).json(updatedChat.rows[0]);
   } catch (error) {
     console.log(error);
     res.status(401).json({ message: "Name update is failed" });
@@ -140,7 +176,11 @@ const renameGroup = async (req, res) => {
 };
 
 const addToGroup = async (req, res) => {
-  const { chatID, userID } = req.body;
+  // const { chatID, userID } = req.body;
+  const chatID = req.body.oldchat.chatid;
+  const { userID } = req.body;
+
+  console.log(req.body);
 
   if (!chatID || !userID) {
     console.log("Fill All the feileds");
@@ -152,11 +192,12 @@ const addToGroup = async (req, res) => {
       `insert into chat_users_junction values (${userID},${chatID}) returning id`
     );
 
-    console.log(newlyAdded.rows[0]);
-    return res.status(200).json({
-      message: `New User successfully added`,
-      newUser: newlyAdded.rows[0],
-    });
+    const newUser = await pool.query(`select * from users where id=${userID}`);
+
+    //console.log(newlyAdded.rows[0]);
+    req.body.oldchat.users.push(newUser.rows[0]);
+
+    return res.status(200).json(req.body.oldchat);
   } catch (error) {
     console.log(error);
     return res.status(400).json({
@@ -167,7 +208,8 @@ const addToGroup = async (req, res) => {
 };
 
 const removeFromGroup = async (req, res) => {
-  const { chatID, userID } = req.body;
+  const chatID = req.body.oldchat.chatid;
+  const userID = req.body.userId;
 
   if (!chatID || !userID) {
     console.log("Fill All the feileds");
@@ -175,14 +217,15 @@ const removeFromGroup = async (req, res) => {
   }
   try {
     const userRemoved = await pool.query(
-      `delete from chat_users_junction where id=${userID} returning id`
+      `delete from chat_users_junction where id=${userID} and chatid=${chatID} returning id`
     );
 
-    console.log(userRemoved.rows[0]);
-    return res.status(200).json({
-      message: `User removed successfully`,
-      newUser: userRemoved.rows[0],
-    });
+    const arr = req.body.oldchat.users.filter((l) => l.id !== userID);
+
+    console.log(arr);
+    req.body.oldchat.users = arr;
+    // console.log(userRemoved.rows[0]);
+    return res.status(200).json(req.body.oldchat);
   } catch (error) {
     console.log(error);
     return res.status(400).json({
@@ -192,43 +235,35 @@ const removeFromGroup = async (req, res) => {
   }
 };
 
-
-const fun = async (row) =>{
-
-return await pool.query(`SELECT * FROM chat_users_junction as j join users as u on j.id = u.id where j.chatid=${row.chatid}`);
-     
-}
+const fun = async (row) => {
+  return await pool.query(
+    `SELECT * FROM chat_users_junction as j join users as u on j.id = u.id where j.chatid=${row.chatid}`
+  );
+};
 const listout = async (req, res) => {
-  const chatID  = req.body;
-  // console.log(chatID);
+  const chatID = req.body;
+
+   console.log("Reached at listout");
   try {
     const list = await pool.query(
       `SELECT u2.username,r1.* from (select chatid,chatname,isgroup,groupadmin,latestmessage,senderid as id, content,time from chat_users_junction as j natural join chat as c join messages as m on m.id=c.latestmessage  where j.id=${chatID.user._id}) as r1 NATURAL join users as u2`
     );
-
-    const arr = [];
+  
 
     for (const row of list.rows) {
-      const user =  fun(row);
-      row.users=(await user).rows;
-     
+      const user = fun(row);
+      row.users = (await user).rows;
     }
 
+    // console.log("||");
+    // list.rows.forEach((row) => {
+    //   console.log(row);
+    // });
 
-    console.log("||")
-    list.rows.forEach((row) => {
-     
-      console.log(row);
-      
-    });
-
-    console.log("||")
+    // console.log("||");
 
     // console.log("List of users:");
     res.status(200).json(list.rows);
-
-
-   
   } catch (error) {
     console.log(error);
     return res.status(400).json({
@@ -245,11 +280,8 @@ const isg = async (req, res) => {
     const list = await pool.query(
       `select id,username from chat_users_junction natural join users where chatid=${chatid}`
     );
-   console.log(list.rows);
+    console.log(list.rows);
     res.status(200).json(list.rows);
-
-
-   
   } catch (error) {
     console.log(error);
     return res.status(400).json({
