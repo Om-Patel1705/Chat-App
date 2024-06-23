@@ -2,65 +2,124 @@ const { common } = require("@mui/material/colors");
 const pool = require("../config/db");
 
 const accessChat = async (req, res) => {
-  const userID = req.body;
+  const {receiveruser,user,chats} = req.body;
 
-  console.log("userID");
-  console.log(userID);
-  console.log("userID");
+  // console.log("userID");
+  // console.log(receiveruser);
+  // console.log("userID");
 
+  req.body.user.id=req.body.user._id;
+  req.body.user.username=req.body.user.name;
+
+  
   try {
-    // Check if there's an existing chat between the two users
-    const data = await pool.query(
-      `
-            WITH r1 AS (
-                SELECT chatid 
-                FROM chat_users_junction 
-                WHERE id = $1
-            ), 
-            r2 AS (
-                SELECT chatid 
-                FROM chat_users_junction 
-                WHERE id = $2
-            )
-            SELECT *  
-            FROM r1 
-            INTERSECT 
-            SELECT *   
-            FROM r2;
-        `,
-      [req.body.user._id, userID]
+
+    const msgid = await pool.query(
+      `insert into messages (senderid,content,time) values (${req.body.user._id},'Kohli for a reason',current_timestamp)  RETURNING id;`
     );
 
-    if (data.rows.length === 0) {
-      const newChat = await pool.query(`
-                INSERT INTO chat (chatname, isgroup) 
-                VALUES ('1to1chat', false) 
-                RETURNING chatid;
-            `);
+      console.log(msgid.rows[0]);
 
-      const chatId = newChat.rows[0].chatid;
 
-      await pool.query(
-        `
-                INSERT INTO chat_users_junction (id, chatid) 
-                VALUES ($1, $2), ($3, $2);
-            `,
-        [req.user.id, chatId, userID]
-      );
+    const returnChat = await pool.query(
+      `insert into chat (chatname,isgroup,latestmessage) values ('One-to-one chat',false,${msgid.rows[0].id})  RETURNING chatid;`
+    );
 
-      res.json({ message: "New chat created", success: true, chatId });
-    } else {
-      // Chat already exists
-      res.json({
-        message: "Chat already exists ",
-        success: true,
-        chatId: data.rows[0].chatid,
-      });
+    // const returnChat = await pool.query(
+    //   `insert into chat (chatname,isgroup,groupadmin,latestmessage) values ('${req.body.name}',true,${req.body.admin._id},${msgid.rows[0].id})  RETURNING chatid;`
+    // );
+
+    
+    
+    const newChat = returnChat.rows[0].chatid;
+    // console.log(newChat);
+   
+    var users = [req.body.user , req.body.receiveruser];
+    var r = "";
+    for (var i = 0; i < users.length; i++) {
+      if(i==0){
+        r = r + `(${users[i]._id},${newChat}),`;
+      }
+      else if (i != users.length-1) {
+        r = r + `(${users[i].id},${newChat}),`;
+      } else {
+        r = r + `(${users[i].id},${newChat})`;
+      }
     }
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ success: false, error: "Internal server error" });
+
+
+
+    // console.log(r);
+ 
+
+    await pool.query(`insert into chat_users_junction (id,chatid) values ${r}`);
+    await pool.query(`update messages set chatid=${newChat} where id=${msgid.rows[0].id}`);
+
+    const data = await pool.query(`SELECT u2.username,r1.* from (select j.chatid,chatname,isgroup,groupadmin,latestmessage,senderid as id, content,time from chat_users_junction as j natural join chat as c right join messages as m on m.id=c.latestmessage  where j.id=${req.body.user.id} and j.chatid=${newChat}) as r1 NATURAL join users as u2 `);
+
+    data.rows[0].users = users;
+
+    console.log(data.rows);
+
+    return res.json(data.rows[0]);
+  } catch (error) {
+    console.log(error);
+    return res.json(error);
   }
+
+  // try {
+  //   // Check if there's an existing chat between the two users
+  //   const data = await pool.query(
+  //     `
+  //           WITH r1 AS (
+  //               SELECT chatid 
+  //               FROM chat_users_junction 
+  //               WHERE id = $1
+  //           ), 
+  //           r2 AS (
+  //               SELECT chatid 
+  //               FROM chat_users_junction 
+  //               WHERE id = $2
+  //           )
+  //           SELECT *  
+  //           FROM r1 
+  //           INTERSECT 
+  //           SELECT *   
+  //           FROM r2;
+  //       `,
+  //     [req.body.user._id, userID]
+  //   );
+
+  //   if (data.rows.length === 0) {
+  //     const newChat = await pool.query(`
+  //               INSERT INTO chat (chatname, isgroup) 
+  //               VALUES ('1to1chat', false) 
+  //               RETURNING chatid;
+  //           `);
+
+  //     const chatId = newChat.rows[0].chatid;
+
+  //     await pool.query(
+  //       `
+  //               INSERT INTO chat_users_junction (id, chatid) 
+  //               VALUES ($1, $2), ($3, $2);
+  //           `,
+  //       [req.user.id, chatId, userID]
+  //     );
+
+  //     res.json({ message: "New chat created", success: true, chatId });
+  //   } else {
+  //     // Chat already exists
+  //     res.json({
+  //       message: "Chat already exists ",
+  //       success: true,
+  //       chatId: data.rows[0].chatid,
+  //     });
+  //   }
+  // } catch (err) {
+  //   console.error(err);
+  //   res.status(500).json({ success: false, error: "Internal server error" });
+  // }
 };
 
 const fetchChats = async (req, res) => {
@@ -82,9 +141,9 @@ const fetchChats = async (req, res) => {
 };
 
 const createGroup = async (req, res) => {
-  if (!req.body.users || !req.body.name) {
-    return res.status(400).json({ message: "Please Fill all the feilds" });
-  }
+
+
+  console.log("reached at createGroup");
 
   req.body.admin.id=req.body.admin._id;
   req.body.admin.username=req.body.admin.name;
@@ -102,7 +161,7 @@ const createGroup = async (req, res) => {
       `insert into messages (senderid,content,time) values (${req.body.admin._id},'Thala for a reason',current_timestamp)  RETURNING id;`
     );
 
-      console.log(msgid.rows[0]);
+      // console.log(msgid.rows[0]);
 
 
     const returnChat = await pool.query(
@@ -134,12 +193,15 @@ const createGroup = async (req, res) => {
  
 
     await pool.query(`insert into chat_users_junction (id,chatid) values ${r}`);
+    await pool.query(`update messages set chatid=${newChat} where id=${msgid.rows[0].id}`);
 
-    const data = await pool.query(`SELECT u2.username,r1.* from (select chatid,chatname,isgroup,groupadmin,latestmessage,senderid as id, content,time from chat_users_junction as j natural join chat as c right join messages as m on m.id=c.latestmessage  where j.id=${req.body.admin.id}) as r1 NATURAL join users as u2`);
 
-    data.rows[0].users = users;
 
-   console.log(data.rows);
+    const data = await pool.query(`SELECT u2.username,r1.* from (select j.chatid,chatname,isgroup,groupadmin,latestmessage,senderid as id, content,time from chat_users_junction as j natural join chat as c right join messages as m on m.id=c.latestmessage  where j.id=${req.body.admin.id} and j.chatid=${newChat}) as r1 NATURAL join users as u2 `);
+
+    data.rows[0].users = users; 
+
+    // console.log(data.rows[0]);
 
     return res.json(data.rows[0]);
   } catch (error) {
@@ -246,7 +308,7 @@ const listout = async (req, res) => {
    console.log("Reached at listout");
   try {
     const list = await pool.query(
-      `SELECT u2.username,r1.* from (select chatid,chatname,isgroup,groupadmin,latestmessage,senderid as id, content,time from chat_users_junction as j natural join chat as c join messages as m on m.id=c.latestmessage  where j.id=${chatID.user._id}) as r1 NATURAL join users as u2`
+      `SELECT u2.username,r1.* from (select j.chatid,chatname,isgroup,groupadmin,latestmessage,senderid as id, content,time from chat_users_junction as j natural join chat as c join messages as m on m.id=c.latestmessage  where j.id=${chatID.user._id}) as r1 NATURAL join users as u2 order by time desc`
     );
   
 

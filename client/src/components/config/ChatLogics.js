@@ -20,4 +20,47 @@ const GetsenderFull = ( chatid ) => {
 
 };
 
-export {Getsender,GetsenderFull};
+
+const isLastMessage = (messages, i, userId) => {
+  return (
+    i === messages.length - 1 &&
+    messages[messages.length - 1].senderid !== userId &&
+    messages[messages.length - 1].senderid
+  );
+};
+
+
+ const isSameSender = (messages, m, i, userId) => {
+  return (
+    i < messages.length - 1 &&
+    (messages[i + 1].senderid !== m.senderid ||
+      messages[i + 1].senderid === undefined) &&
+    messages[i].senderid !== userId
+  );
+};
+
+ const isSameUser = (messages, m, i) => {
+  return i > 0 && messages[i - 1].senderid === m.senderid;
+};
+
+
+ const isSameSenderMargin = (messages, m, i, userId) => {
+  // console.log(i === messages.length - 1);
+
+  if (
+    i < messages.length - 1 &&
+    messages[i + 1].senderid === m.senderid &&
+    messages[i].senderid !== userId
+  )
+    return 33;
+  else if (
+    (i < messages.length - 1 &&
+      messages[i + 1].senderid !== m.senderid &&
+      messages[i].senderid !== userId) ||
+    (i === messages.length - 1 && messages[i].senderid !== userId)
+  )
+    return 0;
+  else return "auto";
+};
+
+export {Getsender,GetsenderFull,isLastMessage,isSameSender,isSameSenderMargin,isSameUser};

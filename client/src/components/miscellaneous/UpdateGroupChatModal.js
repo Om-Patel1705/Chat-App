@@ -28,6 +28,7 @@ const UpdateGroupChatModal = ({fetchMessages, fetchAgain, setFetchAgain }) => {
   const [groupChatName, setGroupChatName] = useState();
   const [search, setSearch] = useState("");
   const [searchResult, setSearchResult] = useState([]);
+  // const [selectedUsers, setSelectedUsers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [renameloading, setRenameLoading] = useState(false);
   const toast = useToast();

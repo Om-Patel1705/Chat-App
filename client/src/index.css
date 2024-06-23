@@ -112,3 +112,7 @@ Input{
 .llll{
   object-fit: cover;
 }
+
+.messages{
+  overflow: scroll !important;
+}

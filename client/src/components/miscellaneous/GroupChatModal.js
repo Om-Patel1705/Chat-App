@@ -19,7 +19,7 @@ import UserBadgeItem from "../userAvatar/userBadgeItem";
 import UserListItem from "../userAvatar/userListItem";
 import axios from "axios";
 
-const GroupChatModal = ({ children }) => {
+const GroupChatModal = ({ children , fetchAgain, setFetchAgain}) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [groupChatName, setGroupChatName] = useState();
   const [selectedUsers, setSelectedUsers] = useState([]);
@@ -28,7 +28,7 @@ const GroupChatModal = ({ children }) => {
   const [loading, setLoading] = useState(false);
   const toast = useToast();
 
-  const { user, chats, setChats } = ChatState();
+  const { user, chats, setChats  } = ChatState();
 
   const handleGroup = (userToAdd) => {
     
@@ -118,13 +118,19 @@ const GroupChatModal = ({ children }) => {
           {
             name: groupChatName,
             users: selectedUsers,
-            admin : user
+            admin : user,
+        
           },
           config
         );
 
         console.log(data);
         setChats([data, ...chats]);
+
+        setSelectedUsers([]);
+        setSearchResult([]);
+        setFetchAgain(!fetchAgain);
+        
         
         onClose();
         toast({
@@ -135,9 +141,11 @@ const GroupChatModal = ({ children }) => {
           position: "bottom",
         });
       } catch (error) {
+
+        console.log(error);
         toast({
           title: "Failed to Create the Chat!",
-          description: error.response.data,
+          description: "Something went wrong",
           status: "error",
           duration: 5000,
           isClosable: true,

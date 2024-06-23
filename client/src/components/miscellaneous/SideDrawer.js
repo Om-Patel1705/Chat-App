@@ -32,7 +32,7 @@ import ProfileModal from "./ProfileModal";
 import { ChatState } from "../../context/chatProvider";
 import { json, useNavigate } from "react-router-dom";
 
-function SideDrawer() {
+function SideDrawer({fetchAgain,setFetchAgain}) {
   const [search, setSearch] = useState("");
   const [searchResult, setSearchResult] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -47,6 +47,7 @@ function SideDrawer() {
     setNotification,
     chats,
     setChats,
+    
   } = ChatState();
 
   const toast = useToast();
@@ -57,50 +58,36 @@ function SideDrawer() {
     navigate("/");
   };
 
-  const handleSearch = async () => {
-    if (!search) {
-      toast({
-        title: "Please Enter something in search",
-        status: "warning",
-        duration: 5000,
-        isClosable: true,
-        position: "top-left",
-      });
+const handleSearch = async (query) => {
+     setSearch(query);
+
+    //  if (!search) {
+    //   toast({
+    //     title: "Please Enter something in search",
+    //     status: "warning",
+    //     duration: 5000,
+    //     isClosable: true,
+    //     position: "top-left",
+    //   });
+    //   return;
+    // }
+
+   
+    if (!query) {
+      setSearchResult([]);
       return;
     }
 
     try {
       setLoading(true);
+      const config = {
+        headers: {
+          Authorization: `Bearer ${user.token}`,
+        },
 
-      console.log(user);
-
-      // const config = {
-      //   headers: {
-      //     Authorization: `Bearer ${user.token}`,
-      //     "Content-Type":"application/json",
-      //   },
-      //   body:JSON.stringify(user),
-      // };
-
-
-
-      // const { data } = await axios.post(`http://localhost:3001/api/chat/search`, config);
-
-
-      const response = await fetch("http://localhost:3001/api/chat/search",{
-              method:"POST",
-              headers:{
-                "Content-Type":"application/json",
-                authorization:`Bearer ${user.token}`
-              },
-              body:JSON.stringify({user,search}),
-            })
-
-
-            const data = await response.json();
-
-
-        console.log(data);
+      };
+      const { data } = await axios.post(`http://localhost:3001/api/chat/search`,{searchUser:query,user:user}, config);
+      // console.log(data);
       setLoading(false);
       setSearchResult(data);
     } catch (error) {
@@ -112,12 +99,31 @@ function SideDrawer() {
         isClosable: true,
         position: "bottom-left",
       });
+      setLoading(false);
     }
   };
+  const accessChat = async (receiveruser) => {
 
-  const accessChat = async (userId) => {
-    console.log(userId);
+    var f = 0;
 
+    chats.forEach(chat => {
+      if(!chat.isgroup){
+        if(chat.users[0].id == receiveruser.id ||  chat.users[1].id == receiveruser.id )f=1;
+      }
+    });
+
+    if(f){
+      toast({
+        title: "User is already in your inbox",
+        status: "warning",
+        duration: 5000,
+        isClosable: true,
+        position: "top-left",
+      });
+      return;
+    }
+  
+  
     try {
       setLoadingChat(true);
       const config = {
@@ -126,11 +132,14 @@ function SideDrawer() {
           Authorization: `Bearer ${user.token}`,
         },
       };
-      const { data } = await axios.post(`/api/chat`, { userId }, config);
+      const { data } = await axios.post(`http://localhost:3001/api/chat/`, { receiveruser , user , chats}, config);
 
       if (!chats.find((c) => c._id === data._id)) setChats([data, ...chats]);
       setSelectedChat(data);
       setLoadingChat(false);
+      setSearchResult([]);
+      setSearch("");
+      setFetchAgain(!fetchAgain);
       onClose();
     } catch (error) {
       toast({
@@ -158,7 +167,7 @@ function SideDrawer() {
         <Tooltip label="Search Users to chat" hasArrow placement="bottom-end">
           <Button variant="ghost" onClick={onOpen}>
             <i className="fas fa-search"></i>
-            <Text d={{ base: "none", md: "flex" }} px={4}>
+            <Text display={{ base: "none", md: "flex" }} px={4}>
               Search User
             </Text>
           </Button>
@@ -217,14 +226,14 @@ function SideDrawer() {
         <DrawerContent>
           <DrawerHeader borderBottomWidth="1px">Search Users</DrawerHeader>
           <DrawerBody>
-            <Box d="flex" pb={2}>
+            <Box display="flex" pb={2}>
               <Input
                 placeholder="Search by name or email"
                 mr={2}
                 value={search}
-                onChange={(e) => setSearch(e.target.value)}
+                onChange={(e) => handleSearch(e.target.value)}
               />
-              <Button onClick={handleSearch}>Go</Button>
+             
             </Box>
             {loading ? (
               <ChatLoading />
@@ -233,7 +242,7 @@ function SideDrawer() {
                 <UserListItem
                   key={u.id}
                   user={u}
-                  handleFunction={() => accessChat(u.id)}
+                  handleFunction={() => accessChat(u)}
                 />
               ))
             )}

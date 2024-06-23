@@ -13,13 +13,15 @@ import { Button } from "@chakra-ui/react";
 import { ChatState } from "../context/chatProvider.js";
 import { Getsender, GetsenderFull } from "./config/ChatLogics.js";
 import GroupChatModal from "./miscellaneous/GroupChatModal.js";
-const MyChats = ({ fetchAgain }) => {
+
+
+const MyChats = ({ fetchAgain ,setFetchAgain}) => {
   const you = "You";
   const [loggedUser, setLoggedUser] = useState();
   const [Image1, seIm] = useState(
     "https://cdn6.aptoide.com/imgs/1/2/2/1221bc0bdd2354b42b293317ff2adbcf_icon.png?w=128"
   );
-  const { selectedChat, setSelectedChat, user, chats, setChats } = ChatState();
+  const { selectedChat, setSelectedChat, user, chats, setChats} = ChatState();
   const [chatnames, setChatnames] = useState([]);
 
   const toast = useToast();
@@ -110,7 +112,9 @@ const MyChats = ({ fetchAgain }) => {
         alignItems="center"
       >
         My Chats
-        <GroupChatModal>
+        <GroupChatModal  
+                   fetchAgain={fetchAgain}
+                    setFetchAgain={setFetchAgain} >
           <Button
             display="flex"
             fontSize={{ base: "17px", md: "10px", lg: "17px" }}
