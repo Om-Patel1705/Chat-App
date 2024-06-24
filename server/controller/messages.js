@@ -13,7 +13,7 @@ const addMessage= async(req,res)=>{
     const data = await pool.query(`select * from messages where id=${msgid.rows[0].id}`);
     
     await pool.query(`update chat set latestmessage=${msgid.rows[0].id} where chatid=${chatId.chatid}`);
- console.log(chatId); 
+//  console.log(chatId); 
     res.json(data.rows[0]);
     }
 

@@ -24,7 +24,7 @@ function Home() {
     <div className="mainbox">
       <Box
         className="upperbox"
-        d="flex"
+        display="flex"
         justifyContent="center"
         p={3}
         backgroundColor={"White"}

@@ -27,9 +27,38 @@ const io = new Server(server, {
   }, 
 }); 
 
-// io.on("connection", (socket) => {
-//   console.log(`User Connected: ${socket.id}`); 
+io.on("connection", (socket) => {
+  console.log(`User Connected: ${socket.id}`);
+  
+    socket.on("setup",(user)=>{
+      // console.log(user);
+      socket.join(user._id);
+      socket.emit("connected");
+    });
 
+    socket.on("join chat",(room)=>{
+      socket.join(room);
+      console.log("User joined Room: "+ room);
+    });
+
+    socket.on("newMessage", (newMessageRecieved) => {
+      var chat = newMessageRecieved;
+
+      // console.log(chat.selectedChat);
+  
+      if (!chat.selectedChat.users) return console.log("chat.users not defined");
+  console.log(chat.selectedChat.users);
+      chat.selectedChat.users.forEach((user) => {
+        if (user.id == newMessageRecieved.data.senderid) return;
+  
+        socket.in(user.id).emit("message received", newMessageRecieved.data);
+      });
+    });
+    socket.off("setup", () => {
+      console.log("USER DISCONNECTED");
+      socket.leave(user._id);
+    });
+});
 //   socket.on("room1", (data) => {
 //    // console.log(data);
 //     socket.join(data);

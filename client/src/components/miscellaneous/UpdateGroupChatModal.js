@@ -240,7 +240,7 @@ const handleAddUser = async (user1) => {
           <ModalHeader
             fontSize="35px"
             fontFamily="Work sans"
-            d="flex"
+            display="flex"
             justifyContent="center"
           >
             <Text> {selectedChat.chatname}</Text>

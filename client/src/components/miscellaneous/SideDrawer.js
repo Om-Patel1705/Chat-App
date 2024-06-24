@@ -31,6 +31,7 @@ import ProfileModal from "./ProfileModal";
  import UserListItem from "../userAvatar/userListItem";
 import { ChatState } from "../../context/chatProvider";
 import { json, useNavigate } from "react-router-dom";
+import chatlogo from "../../utils/reshot-icon-messenger-82S9U6ZBLD.svg"
 
 function SideDrawer({fetchAgain,setFetchAgain}) {
   const [search, setSearch] = useState("");
@@ -156,7 +157,7 @@ const handleSearch = async (query) => {
   return (
     <>
       <Box
-        d="flex"
+        display="flex"
         justifyContent="space-between"
         alignItems="center"
         bg="white"
@@ -172,9 +173,7 @@ const handleSearch = async (query) => {
             </Text>
           </Button>
         </Tooltip>
-        <Text fontSize="2xl" fontFamily="Work sans">
-          Chat-App
-        </Text>
+       <Text>😀</Text>
         <div>
           <Menu>
             <MenuButton p={1}>
@@ -246,7 +245,7 @@ const handleSearch = async (query) => {
                 />
               ))
             )}
-            {loadingChat && <Spinner ml="auto" d="flex" />}
+            {loadingChat && <Spinner ml="auto" display="flex" />}
           </DrawerBody>
         </DrawerContent>
       </Drawer>

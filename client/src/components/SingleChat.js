@@ -17,6 +17,10 @@ import UpdateGroupChatModal from "./miscellaneous/UpdateGroupChatModal";
 import ScrollableChat from "./userAvatar/ScrollableChat";
 import Lottie from "react-lottie";
 import axios from "axios";
+import io from "socket.io-client"
+
+const ENDPOINT = "http://localhost:3001";
+var socket, selectedChatCompare;
 
 const SingleChat = ({ fetchAgain, setFetchAgain }) => {
   const [Image1, seIm] = useState(
@@ -29,8 +33,8 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
   const [typing, setTyping] = useState(false);
   const [istyping, setIsTyping] = useState(false);
   const toast = useToast();
-
-  const { user, selectedChat, setSelectedChat } = ChatState();
+  const { selectedChat, setSelectedChat, user, notification, setNotification } =
+    ChatState();
 
   useEffect(() => {
     console.log("Updated messages:", messages);
@@ -55,11 +59,9 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
         config
       );
 
-      console.log("Fetched messages:", data);
       setMessages(data);
       setLoading(false);
-
-      // socket.emit("join chat", selectedChat._id);
+      socket.emit("join chat", selectedChat.chatid);
     } catch (error) {
       toast({
         title: "Error Occurred!",
@@ -92,7 +94,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
           },
           config
         );
-
+        socket.emit("newMessage", { data, selectedChat });
         setMessages((prevMessages) => [...prevMessages, data]);
       } catch (error) {
         console.log(error);
@@ -108,6 +110,43 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
     }
   };
 
+  useEffect(() => {
+    socket = io(ENDPOINT);
+    socket.emit("setup", user);
+    socket.on("connection", () => { setSocketConnected(true) });
+
+    // Clean up socket connection on component unmount
+    return () => {
+      socket.disconnect();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!socket) return;
+
+    socket.on("message received", (newMessageReceived) => {
+      if (!selectedChatCompare || selectedChatCompare.chatid !== newMessageReceived.chatid) {
+        if (!notification.includes(newMessageReceived)) {
+          setNotification([newMessageReceived, ...notification]);
+          setFetchAgain(!fetchAgain);
+        }
+      } else {
+        setMessages((prevMessages) => [...prevMessages, newMessageReceived]);
+      }
+    });
+
+    // Clean up listener on component unmount or when dependencies change
+    return () => {
+      socket.off("message received");
+    };
+  }, [selectedChat, notification, fetchAgain]);
+
+  useEffect(() => {
+    setMessages([]);
+    fetchMessages();
+    selectedChatCompare = selectedChat;
+  }, [selectedChat]);
+
   const defaultOptions = () => {
     return;
   };
@@ -115,11 +154,8 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
   const typingHandler = (event) => {
     setNewMessage(event.target.value);
 
-    // if (!socketConnected) return;
-
     if (!typing) {
       setTyping(true);
-      // socket.emit("typing", selectedChat._id);
     }
     let lastTypingTime = new Date().getTime();
     var timerLength = 3000;
@@ -127,19 +163,10 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
       var timeNow = new Date().getTime();
       var timeDiff = timeNow - lastTypingTime;
       if (timeDiff >= timerLength && typing) {
-        // socket.emit("stop typing", selectedChat._id);
         setTyping(false);
       }
     }, timerLength);
   };
-
-  useEffect(() => {
-    setMessages([]);
-    fetchMessages();
-
-    // selectedChatCompare = selectedChat;
-    // eslint-disable-next-line
-  }, [selectedChat]);
 
   return (
     <>
@@ -152,7 +179,6 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
             px={2}
             w="100%"
             fontFamily="Work sans"
-            d="flex"
             justifyContent={{ base: "even-between" }}
             alignItems="center"
           >
@@ -189,7 +215,6 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
                   src={Image1}
                   alt={"Group"}
                 />
-
                 {selectedChat.chatname}
                 <div className="photo">
                   <UpdateGroupChatModal
@@ -201,7 +226,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
             )}
           </Text>
           <Box
-            d="flex"
+            display="flex"
             flexDir="column"
             justifyContent="flex-end"
             p={3}
@@ -214,9 +239,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
             {loading ? (
               <Spinner size="xl" w={20} h={20} alignSelf="center" margin="auto" />
             ) : (
-              <div >
-                <ScrollableChat messages={messages} />
-              </div>
+              <ScrollableChat messages={messages} />
             )}
 
             <FormControl onKeyDown={sendMessage} id="first-name" isRequired mt={3}>
@@ -228,9 +251,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
                     style={{ marginBottom: 15, marginLeft: 0 }}
                   />
                 </div>
-              ) : (
-                <></>
-              )}
+              ) : null}
               <Input
                 variant="filled"
                 bg="#E0E0E0"
