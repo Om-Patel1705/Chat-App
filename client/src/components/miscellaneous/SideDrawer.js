@@ -19,7 +19,7 @@ import {
 import { Tooltip } from "@chakra-ui/tooltip";
 import { BellIcon, ChevronDownIcon } from "@chakra-ui/icons";
 import { Avatar } from "@chakra-ui/avatar";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import { useToast } from "@chakra-ui/toast";
 import ChatLoading from "../ChatLoading";
@@ -28,16 +28,21 @@ import ProfileModal from "./ProfileModal";
 //import NotificationBadge from "react-notification-badge";
 //import { Effect } from "react-notification-badge";
 //  import { getSender } from "../../config/ChatLogics";
- import UserListItem from "../userAvatar/userListItem";
+import UserListItem from "../userAvatar/userListItem";
 import { ChatState } from "../../context/chatProvider";
 import { json, useNavigate } from "react-router-dom";
-import chatlogo from "../../utils/reshot-icon-messenger-82S9U6ZBLD.svg"
+import chatlogo from "../../utils/reshot-icon-messenger-82S9U6ZBLD.svg";
+import { io } from "socket.io-client";
 
-function SideDrawer({fetchAgain,setFetchAgain}) {
+const ENDPOINT = "http://localhost:3001";
+var socket, selectedChatCompare;
+
+function SideDrawer({ fetchAgain, setFetchAgain }) {
   const [search, setSearch] = useState("");
   const [searchResult, setSearchResult] = useState([]);
   const [loading, setLoading] = useState(false);
   const [loadingChat, setLoadingChat] = useState(false);
+  const [socketConnected, setSocketConnected] = useState(false);
   const navigate = useNavigate();
 
 
@@ -48,7 +53,6 @@ function SideDrawer({fetchAgain,setFetchAgain}) {
     setNotification,
     chats,
     setChats,
-    
   } = ChatState();
 
   const toast = useToast();
@@ -59,8 +63,20 @@ function SideDrawer({fetchAgain,setFetchAgain}) {
     navigate("/");
   };
 
-const handleSearch = async (query) => {
-     setSearch(query);
+
+  useEffect(() => {
+    socket = io(ENDPOINT);
+    socket.emit("setup", user);
+    socket.on("connection", () => { setSocketConnected(true) });
+
+    // Clean up socket connection on component unmount
+    return () => {
+      socket.disconnect();
+    };
+  }, []);
+
+  const handleSearch = async (query) => {
+    setSearch(query);
 
     //  if (!search) {
     //   toast({
@@ -73,7 +89,6 @@ const handleSearch = async (query) => {
     //   return;
     // }
 
-   
     if (!query) {
       setSearchResult([]);
       return;
@@ -85,9 +100,12 @@ const handleSearch = async (query) => {
         headers: {
           Authorization: `Bearer ${user.token}`,
         },
-
       };
-      const { data } = await axios.post(`http://localhost:3001/api/chat/search`,{searchUser:query,user:user}, config);
+      const { data } = await axios.post(
+        `http://localhost:3001/api/chat/search`,
+        { searchUser: query, user: user },
+        config
+      );
       // console.log(data);
       setLoading(false);
       setSearchResult(data);
@@ -104,16 +122,19 @@ const handleSearch = async (query) => {
     }
   };
   const accessChat = async (receiveruser) => {
-
     var f = 0;
 
-    chats.forEach(chat => {
-      if(!chat.isgroup){
-        if(chat.users[0].id == receiveruser.id ||  chat.users[1].id == receiveruser.id )f=1;
+    chats.forEach((chat) => {
+      if (!chat.isgroup) {
+        if (
+          chat.users[0].id == receiveruser.id ||
+          chat.users[1].id == receiveruser.id
+        )
+          f = 1;
       }
     });
 
-    if(f){
+    if (f) {
       toast({
         title: "User is already in your inbox",
         status: "warning",
@@ -123,8 +144,7 @@ const handleSearch = async (query) => {
       });
       return;
     }
-  
-  
+
     try {
       setLoadingChat(true);
       const config = {
@@ -133,10 +153,30 @@ const handleSearch = async (query) => {
           Authorization: `Bearer ${user.token}`,
         },
       };
-      const { data } = await axios.post(`http://localhost:3001/api/chat/`, { receiveruser , user , chats}, config);
+      var { data } = await axios.post(
+        `http://localhost:3001/api/chat/`,
+        { receiveruser, user, chats },
+        config
+      );
 
       if (!chats.find((c) => c._id === data._id)) setChats([data, ...chats]);
       setSelectedChat(data);
+      // console.log(data);
+
+      const tempdata = {
+        id: data.latestmessage,
+        senderid: data.id,
+        content: data.content,
+        time: data.time,
+        chatid: data.chatid,
+      };
+
+      const selectedChat = data;
+
+
+data = tempdata;
+      socket.emit("newMessage", { data, selectedChat });
+
       setLoadingChat(false);
       setSearchResult([]);
       setSearch("");
@@ -153,6 +193,9 @@ const handleSearch = async (query) => {
       });
     }
   };
+
+  
+
 
   return (
     <>
@@ -173,7 +216,7 @@ const handleSearch = async (query) => {
             </Text>
           </Button>
         </Tooltip>
-       <Text>😀</Text>
+        <Text>😀</Text>
         <div>
           <Menu>
             <MenuButton p={1}>
@@ -232,7 +275,6 @@ const handleSearch = async (query) => {
                 value={search}
                 onChange={(e) => handleSearch(e.target.value)}
               />
-             
             </Box>
             {loading ? (
               <ChatLoading />

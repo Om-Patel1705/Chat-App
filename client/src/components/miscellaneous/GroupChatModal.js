@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { ChatState } from "../../context/chatProvider";
 import {
   Box,
@@ -18,9 +18,15 @@ import {
 import UserBadgeItem from "../userAvatar/userBadgeItem";
 import UserListItem from "../userAvatar/userListItem";
 import axios from "axios";
+import { io } from "socket.io-client";
 
-const GroupChatModal = ({ children , fetchAgain, setFetchAgain}) => {
+const ENDPOINT = "http://localhost:3001";
+var socket, selectedChatCompare;
+
+const GroupChatModal = ({ children, fetchAgain, setFetchAgain }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const [socketConnected, setSocketConnected] = useState(false);
+
   const [groupChatName, setGroupChatName] = useState();
   const [selectedUsers, setSelectedUsers] = useState([]);
   const [search, setSearch] = useState("");
@@ -28,22 +34,34 @@ const GroupChatModal = ({ children , fetchAgain, setFetchAgain}) => {
   const [loading, setLoading] = useState(false);
   const toast = useToast();
 
-  const { user, chats, setChats  } = ChatState();
+  const { user, chats, setChats } = ChatState();
+
+  useEffect(() => {
+    socket = io(ENDPOINT);
+    socket.emit("setup", user);
+    socket.on("connection", () => {
+      setSocketConnected(true);
+    });
+
+    // Clean up socket connection on component unmount
+    return () => {
+      socket.disconnect();
+    };
+  }, []);
 
   const handleGroup = (userToAdd) => {
-    
     if (selectedUsers.includes(userToAdd)) {
-        toast({
-          title: "User already added",
-          status: "warning",
-          duration: 5000,
-          isClosable: true,
-          position: "top",
-        });
-        return;
-      }
-  
-      setSelectedUsers([...selectedUsers, userToAdd]);
+      toast({
+        title: "User already added",
+        status: "warning",
+        duration: 5000,
+        isClosable: true,
+        position: "top",
+      });
+      return;
+    }
+
+    setSelectedUsers([...selectedUsers, userToAdd]);
   };
   const handleSearch = async (query) => {
     setSearch(query);
@@ -83,82 +101,93 @@ const GroupChatModal = ({ children , fetchAgain, setFetchAgain}) => {
 
   const handleDelete = (delUser) => {
     setSelectedUsers(selectedUsers.filter((sel) => sel.id !== delUser.id));
-    
   };
   const handleSubmit = async () => {
     if (!groupChatName || !selectedUsers) {
-        toast({
-          title: "Please fill all the feilds",
-          status: "warning",
-          duration: 5000,
-          isClosable: true,
-          position: "top",
-        });
-        return;
-      }
+      toast({
+        title: "Please fill all the feilds",
+        status: "warning",
+        duration: 5000,
+        isClosable: true,
+        position: "top",
+      });
+      return;
+    }
 
-      if(selectedUsers.length < 2){
-        toast({
-            title: "Choose atleast 2 users",
-            status: "error",
-            duration: 5000,
-            isClosable: true,
-            position: "top",
-          });
-          return;
-      }
-      try {
-        const config = {
-          headers: {
-            Authorization: `Bearer ${user.token}`,
-          },
-        };
-        const { data } = await axios.post(
-          `http://localhost:3001/api/chat/group`,
-          {
-            name: groupChatName,
-            users: selectedUsers,
-            admin : user,
-        
-          },
-          config
-        );
+    if (selectedUsers.length < 2) {
+      toast({
+        title: "Choose atleast 2 users",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+        position: "top",
+      });
+      return;
+    }
+    try {
+      const config = {
+        headers: {
+          Authorization: `Bearer ${user.token}`,
+        },
+      };
+      var { data } = await axios.post(
+        `http://localhost:3001/api/chat/group`,
+        {
+          name: groupChatName,
+          users: selectedUsers,
+          admin: user,
+        },
+        config
+      );
 
-        console.log(data);
-        setChats([data, ...chats]);
+      // console.log(data);
+      setChats([data, ...chats]);
 
-        setSelectedUsers([]);
-        setSearchResult([]);
-        setFetchAgain(!fetchAgain);
-        
-        
-        onClose();
-        toast({
-          title: "New Group Chat Created!",
-          status: "success",
-          duration: 5000,
-          isClosable: true,
-          position: "bottom",
-        });
-      } catch (error) {
+      // console.log(data);
 
-        console.log(error);
-        toast({
-          title: "Failed to Create the Chat!",
-          description: "Something went wrong",
-          status: "error",
-          duration: 5000,
-          isClosable: true,
-          position: "bottom",
-        });
-      }
+      const tempdata = {
+        id: data.latestmessage,
+        senderid: data.id,
+        content: data.content,
+        time: data.time,
+        chatid: data.chatid,
+      };
+
+      const selectedChat = data;
+
+      data = tempdata;
+      socket.emit("newMessage", { data, selectedChat });
+
+      setSelectedUsers([]);
+      setSearchResult([]);
+      setFetchAgain(!fetchAgain);
+
+      onClose();
+      toast({
+        title: "New Group Chat Created!",
+        status: "success",
+        duration: 5000,
+        isClosable: true,
+        position: "bottom",
+      });
+    } catch (error) {
+      console.log(error);
+      toast({
+        title: "Failed to Create the Chat!",
+        description: "Something went wrong",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+        position: "bottom",
+      });
+    }
   };
 
   return (
     <div>
       <span onClick={onOpen}>{children}</span>
 
-      <Modal onClose={onClose} isOpen={isOpen} >
+      <Modal onClose={onClose} isOpen={isOpen}>
         <ModalOverlay />
         <ModalContent>
           <ModalHeader
