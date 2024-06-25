@@ -18,7 +18,7 @@ const accessChat = async (req, res) => {
       `insert into messages (senderid,content,time) values (${req.body.user._id},'Kohli for a reason',current_timestamp)  RETURNING id;`
     );
 
-      console.log(msgid.rows[0]);
+      // console.log(msgid.rows[0]);
 
 
     const returnChat = await pool.query(
@@ -59,7 +59,7 @@ const accessChat = async (req, res) => {
 
     data.rows[0].users = users;
 
-    console.log(data.rows);
+    // console.log(data.rows);
 
     return res.json(data.rows[0]);
   } catch (error) {
@@ -126,13 +126,13 @@ const fetchChats = async (req, res) => {
   try {
     const userID = req.body;
 
-    console.log("userID");
-    console.log(userID);
-    console.log("userID");
+    // console.log("userID");
+    // console.log(userID);
+    // console.log("userID");
     const data = await pool.query(
       `select c.* from  chat_users_junction as cuj  join chat as c on c.chatid = cuj.chatid  where id=${req.body._id}`
     );
-    console.log(data.rows);
+    // console.log(data.rows);
     return res.status(200).json(data.rows);
   } catch (error) {
     console.log(error);
@@ -229,7 +229,7 @@ const renameGroup = async (req, res) => {
     );
 
     updatedChat.rows[0].users = oldchat.users;
-    console.log(updatedChat.rows[0]);
+    // console.log(updatedChat.rows[0]);
     res.status(200).json(updatedChat.rows[0]);
   } catch (error) {
     console.log(error);
@@ -242,14 +242,14 @@ const addToGroup = async (req, res) => {
   const chatID = req.body.oldchat.chatid;
   const { userID } = req.body;
 
-  console.log(req.body);
+  // console.log(req.body);
 
   if (!chatID || !userID) {
     console.log("Fill All the feileds");
     return res.status(400).json({ message: "Please fill all the feiled" });
   }
 
-  try {
+  try {  
     const newlyAdded = await pool.query(
       `insert into chat_users_junction values (${userID},${chatID}) returning id`
     );
@@ -284,9 +284,9 @@ const removeFromGroup = async (req, res) => {
 
     const arr = req.body.oldchat.users.filter((l) => l.id !== userID);
 
-    console.log(arr);
+    // console.log(arr);
     req.body.oldchat.users = arr;
-    // console.log(userRemoved.rows[0]);
+    // console.log(userRemoved.rows[0]); 
     return res.status(200).json(req.body.oldchat);
   } catch (error) {
     console.log(error);
@@ -321,7 +321,6 @@ const listout = async (req, res) => {
     // list.rows.forEach((row) => {
     //   console.log(row);
     // });
-
     // console.log("||");
 
     // console.log("List of users:");
@@ -337,17 +336,17 @@ const listout = async (req, res) => {
 
 const isg = async (req, res) => {
   const chatid = req.body.chatid;
-  console.log(chatid);
+  // console.log(chatid);
   try {
     const list = await pool.query(
       `select id,username from chat_users_junction natural join users where chatid=${chatid}`
     );
-    console.log(list.rows);
+    // console.log(list.rows);
     res.status(200).json(list.rows);
   } catch (error) {
     console.log(error);
     return res.status(400).json({
-      message: "Something went wrong",
+      message: "Something went wrong", 
       error: error,
     });
   }

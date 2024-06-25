@@ -44,10 +44,10 @@ io.on("connection", (socket) => {
     socket.on("newMessage", (newMessageRecieved) => {
       var chat = newMessageRecieved;
 
-      console.log(chat);
+      // console.log(chat);
   
       if (!chat.selectedChat.users) return console.log("chat.users not defined");
-  console.log(chat.selectedChat.users);
+  // console.log(chat.selectedChat.users);
       chat.selectedChat.users.forEach((user) => {
         if (user.id == newMessageRecieved.data.senderid) return;
   

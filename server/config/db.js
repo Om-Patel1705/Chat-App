@@ -19,14 +19,14 @@ require('dotenv').config();
 config();
 
 const pool = new Pool({
-  user: "postgres",
-  password: "12345",
-  database: "chat-app-db",
-  host: "localhost",
-  port: 5432
+  // user: "postgres",
+  // password: "12345",
+  // database: "chat-app-db",
+  // host: "localhost",
+  // port: 5432
 
-  // connectionString: process.env.DATABASE_URL,
-  // ssl: true
+ connectionString: process.env.DATABASE_URL,
+    ssl: true
 });
 
 pool.connect()

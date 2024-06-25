@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, startTransition } from "react";
 import "../index.css";
 import {
+  Avatar,
   FormControl,
   IconButton,
   Input,
@@ -94,8 +95,13 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
           },
           config
         );
+
         socket.emit("newMessage", { data, selectedChat });
-        setMessages((prevMessages) => [...prevMessages, data]);
+
+        startTransition(() => {
+          setFetchAgain(!fetchAgain);
+          setMessages((prevMessages) => [...prevMessages, data]);
+        });
       } catch (error) {
         console.log(error);
         toast({
@@ -115,27 +121,28 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
     socket.emit("setup", user);
     socket.on("connection", () => { setSocketConnected(true) });
 
-    // Clean up socket connection on component unmount
     return () => {
       socket.disconnect();
     };
-  }, []);
+  }, [user]);
 
   useEffect(() => {
     if (!socket) return;
 
     socket.on("message received", (newMessageReceived) => {
-      if (!selectedChatCompare || selectedChatCompare.chatid !== newMessageReceived.chatid) {
-        if (!notification.includes(newMessageReceived)) {
-          setNotification([newMessageReceived, ...notification]);
+      startTransition(() => {
+        if (!selectedChatCompare || selectedChatCompare.chatid !== newMessageReceived.chatid) {
+          if (!notification.includes(newMessageReceived)) {
+            setNotification([newMessageReceived, ...notification]);
+            setFetchAgain(!fetchAgain);
+          }
+        } else {
           setFetchAgain(!fetchAgain);
+          setMessages((prevMessages) => [...prevMessages, newMessageReceived]);
         }
-      } else {
-        setMessages((prevMessages) => [...prevMessages, newMessageReceived]);
-      }
+      });
     });
 
-    // Clean up listener on component unmount or when dependencies change
     return () => {
       socket.off("message received");
     };
@@ -190,30 +197,32 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
             />
             {!selectedChat.isgroup ? (
               <>
-                <Image
+              <Avatar
                   ml={2}
                   mr={2}
                   className="llll"
-                  borderRadius="full"
-                  boxSize="50px"
+                   boxSize="50px"
+                   bg="#2abaf7"
+                 
+                  name={GetsenderFull(selectedChat).username}
                   src={GetsenderFull(selectedChat).pic}
-                  alt={GetsenderFull(selectedChat).username}
                 />
-                {GetsenderFull(selectedChat).username}
+
+                {"  "+GetsenderFull(selectedChat).username}
                 <div className="photo">
                   <ProfileModal user={GetsenderFull(selectedChat)} />
                 </div>
               </>
             ) : (
               <>
-                <Image
+              <Avatar
                   ml={2}
                   mr={2}
                   className="llll"
-                  borderRadius="full"
-                  boxSize="50px"
+                   boxSize="50px"
+                 
+                  name={GetsenderFull(selectedChat).username}
                   src={Image1}
-                  alt={"Group"}
                 />
                 {selectedChat.chatname}
                 <div className="photo">
@@ -230,7 +239,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
             flexDir="column"
             justifyContent="flex-end"
             p={3}
-            bg="#E8E8E8"
+            bg="#F8F8F8"
             w="100%"
             h="100%"
             borderRadius="lg"

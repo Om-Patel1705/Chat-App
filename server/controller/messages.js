@@ -29,10 +29,10 @@ const allMessages = async (req, res) => {
   //  console.log(chatid);
   try {
     const data = await pool.query(
-      `select * from (select * from messages where chatid=${chatid} ORDER BY time) as r1 join users as u on u.id=r1.senderid `
+      `select * from (select * from messages where chatid=${chatid} ) as r1 join users as u on u.id=r1.senderid ORDER BY time`
     );
     res.json(data.rows);
-    //  console.log(data.rows);
+   console.log(data.rows);
   } catch (error) {
     console.log(error);
     res.json(error);
