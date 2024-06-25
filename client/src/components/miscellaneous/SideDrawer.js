@@ -34,7 +34,7 @@ import { json, useNavigate } from "react-router-dom";
 import chatlogo from "../../utils/reshot-icon-messenger-82S9U6ZBLD.svg";
 import { io } from "socket.io-client";
 
-const ENDPOINT = "https://29qg6m1g-3001.inc1.devtunnels.ms";
+const ENDPOINT = "https://chat-app-j34h.onrender.com";
 var socket, selectedChatCompare;
 
 function SideDrawer({ fetchAgain, setFetchAgain }) {
@@ -102,7 +102,7 @@ function SideDrawer({ fetchAgain, setFetchAgain }) {
         },
       };
       const { data } = await axios.post(
-        `https://29qg6m1g-3001.inc1.devtunnels.ms/api/chat/search`,
+        `https://chat-app-j34h.onrender.com/api/chat/search`,
         { searchUser: query, user: user },
         config
       );
@@ -154,7 +154,7 @@ function SideDrawer({ fetchAgain, setFetchAgain }) {
         },
       };
       var { data } = await axios.post(
-        `https://29qg6m1g-3001.inc1.devtunnels.ms/api/chat/`,
+        `https://chat-app-j34h.onrender.com/api/chat/`,
         { receiveruser, user, chats },
         config
       );

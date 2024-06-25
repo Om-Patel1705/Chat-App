@@ -45,7 +45,7 @@ const UpdateGroupChatModal = ({fetchMessages, fetchAgain, setFetchAgain }) => {
         },
       };
       const { data } = await axios.put(
-        `https://29qg6m1g-3001.inc1.devtunnels.ms/api/chat/rename`,
+        `https://chat-app-j34h.onrender.com/api/chat/rename`,
         {
           oldchat: selectedChat,
           newName: groupChatName,
@@ -115,7 +115,7 @@ const handleAddUser = async (user1) => {
         },
       };
       const { data } = await axios.put(
-        `https://29qg6m1g-3001.inc1.devtunnels.ms/api/chat/groupadd`,
+        `https://chat-app-j34h.onrender.com/api/chat/groupadd`,
         {
           oldchat: selectedChat,
           userID: user1.id,
@@ -156,7 +156,7 @@ const handleAddUser = async (user1) => {
         },
 
       };
-      const { data } = await axios.post(`https://29qg6m1g-3001.inc1.devtunnels.ms/api/chat/search`,{searchUser:query,user:user}, config);
+      const { data } = await axios.post(`https://chat-app-j34h.onrender.com/api/chat/search`,{searchUser:query,user:user}, config);
       // console.log(data);
       setLoading(false);
       setSearchResult(data);
@@ -196,7 +196,7 @@ const handleAddUser = async (user1) => {
         },
       };
       const { data } = await axios.put(
-        `https://29qg6m1g-3001.inc1.devtunnels.ms/api/chat/groupremove`,
+        `https://chat-app-j34h.onrender.com/api/chat/groupremove`,
         {
           oldchat: selectedChat,
           userId: user1.id,

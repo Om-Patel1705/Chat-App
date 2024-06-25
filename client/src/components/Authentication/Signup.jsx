@@ -60,7 +60,7 @@ function Signup() {
     }
     try {
      
-      const response = await fetch("https://29qg6m1g-3001.inc1.devtunnels.ms/api/user/register", {
+      const response = await fetch("https://chat-app-j34h.onrender.com/api/user/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
