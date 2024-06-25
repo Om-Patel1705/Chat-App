@@ -35,10 +35,10 @@ function Chats() {
   //     const h = "YASHMC!!";
   //     console.log(h);
 
-  //     //const { data } = await axios.post("http://localhost:3001/api/chat/", config);
+  //     //const { data } = await axios.post("https://chat-app-j34h.onrender.com/api/chat/", config);
   //     //setChats(data);
 
-  //     const response = await fetch("http://localhost:3001/api/chat/load",{
+  //     const response = await fetch("https://chat-app-j34h.onrender.com/api/chat/load",{
   //       method:"POST",
   //       headers:{
   //         "Content-Type":"application/json",

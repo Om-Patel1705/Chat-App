@@ -8,7 +8,7 @@ import Chats from "./pages/Chats";
 const Home = lazy(() => import("./pages/Home"));
 
 //const socket = io.connect("https://0gbr17f6-3001.inc1.devtunnels.ms/");
-//const socket = io.connect("http://localhost:3001");
+//const socket = io.connect("https://chat-app-j34h.onrender.com");
 
 function App() {
   return (

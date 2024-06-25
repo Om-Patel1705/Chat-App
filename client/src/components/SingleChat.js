@@ -20,7 +20,7 @@ import Lottie from "react-lottie";
 import axios from "axios";
 import io from "socket.io-client"
 
-const ENDPOINT = "http://localhost:3001";
+const ENDPOINT = "https://chat-app-j34h.onrender.com";
 var socket, selectedChatCompare;
 
 const SingleChat = ({ fetchAgain, setFetchAgain }) => {
@@ -55,7 +55,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
       setLoading(true);
 
       const { data } = await axios.post(
-        "http://localhost:3001/api/message/all",
+        "https://chat-app-j34h.onrender.com/api/message/all",
         { selectedChat },
         config
       );
@@ -87,7 +87,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
         setNewMessage("");
 
         const { data } = await axios.post(
-          "http://localhost:3001/api/message/",
+          "https://chat-app-j34h.onrender.com/api/message/",
           {
             content: newMessage,
             chatId: selectedChat,

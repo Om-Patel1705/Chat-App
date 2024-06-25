@@ -44,7 +44,7 @@ const MyChats = ({ fetchAgain ,setFetchAgain}) => {
     console.log(selectedChat);
 
     try {
-      const response = await fetch("http://localhost:3001/api/chat/listout", {
+      const response = await fetch("https://chat-app-j34h.onrender.com/api/chat/listout", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

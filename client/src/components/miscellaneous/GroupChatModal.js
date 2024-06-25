@@ -20,7 +20,7 @@ import UserListItem from "../userAvatar/userListItem";
 import axios from "axios";
 import { io } from "socket.io-client";
 
-const ENDPOINT = "http://localhost:3001";
+const ENDPOINT = "https://chat-app-j34h.onrender.com";
 var socket, selectedChatCompare;
 
 const GroupChatModal = ({ children, fetchAgain, setFetchAgain }) => {
@@ -79,7 +79,7 @@ const GroupChatModal = ({ children, fetchAgain, setFetchAgain }) => {
         },
       };
       const { data } = await axios.post(
-        `http://localhost:3001/api/chat/search`,
+        `https://chat-app-j34h.onrender.com/api/chat/search`,
         { searchUser: query, user: user },
         config
       );
@@ -131,7 +131,7 @@ const GroupChatModal = ({ children, fetchAgain, setFetchAgain }) => {
         },
       };
       var { data } = await axios.post(
-        `http://localhost:3001/api/chat/group`,
+        `https://chat-app-j34h.onrender.com/api/chat/group`,
         {
           name: groupChatName,
           users: selectedUsers,
