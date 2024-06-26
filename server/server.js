@@ -21,8 +21,8 @@ dotenv.config();
 
 const io = new Server(server, {
   cors: {
-    //origin: "https://0gbr17f6-3000.inc1.devtunnels.ms/",
-    origin: "http://localhost:3000",
+    origin: "https://chat-app-psi-roan.vercel.app?_vercel_share=wYtcSnJJJxIAsPFfacFEbgBoIJYF4IL0",
+   // origin: "http://localhost:3000",
     methods: ["GET", "POST"],
   }, 
 }); 
