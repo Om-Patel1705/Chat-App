@@ -267,6 +267,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
                 placeholder="Enter a message.."
                 value={newMessage}
                 onChange={typingHandler}
+                autoComplete="off"
               />
             </FormControl>
           </Box>
