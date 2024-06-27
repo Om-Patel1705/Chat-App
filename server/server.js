@@ -21,7 +21,7 @@ dotenv.config();
 
 const io = new Server(server, {
   cors: {
-    origin: "https://chat-app-om-patels-projects-0335a8af.vercel.app/",
+    origin: "https://chat-app-om-patels-projects-0335a8af.vercel.app",
    // origin: "http://localhost:3000",
     methods: ["GET", "POST"],
   }, 
