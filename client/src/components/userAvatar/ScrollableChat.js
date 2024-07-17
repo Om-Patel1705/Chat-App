@@ -8,10 +8,11 @@ import {
   isSameUser,
 } from "../config/ChatLogics";
 import { ChatState } from "../../context/chatProvider";
+import "../../index.css"
 
 const ScrollableChat = ({ messages }) => {
   const { user } = ChatState();
-
+const xx = "     ";
   return (
     <ScrollableFeed >
       {messages &&
@@ -34,7 +35,7 @@ const ScrollableChat = ({ messages }) => {
             <span
               style={{
                 backgroundColor: `${
-                  m.senderid === user._id ? "#BEE3F8" : "#B9F5D0"
+                  m.senderid === user._id ? "#97d9ff" : "#97f3bb"
                 }`,
                 marginLeft: isSameSenderMargin(messages, m, i, user._id),
                 marginTop: isSameUser(messages, m, i, user._id) ? 3 : 10,
@@ -44,6 +45,8 @@ const ScrollableChat = ({ messages }) => {
               }}
             >
               {m.content}
+              <span>{xx}</span>
+              <span className="time">{m.time}</span>
             </span>
           </div>
         ))}
