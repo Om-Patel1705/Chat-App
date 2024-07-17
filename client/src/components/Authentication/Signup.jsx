@@ -30,7 +30,8 @@ function Signup() {
 
   const handleClick = () => setshow(!show);
   const postDetails = (pics) => {};
-  const handleSubmit = async () => {
+  const handleSubmit = async (event) => {
+    if(event.key==`Enter`){
     setLoading(true);
 
     if(!email || !name  || !password || !confirmpassword ){
@@ -116,10 +117,11 @@ function Signup() {
 
       setLoading(false);
     }
+  }
   };
 
   return (
-    <VStack spacing={5}>
+    <VStack spacing={5} onKeyDown={handleSubmit}>
       <FormControl id="name" isRequired>
         <FormLabel>Name</FormLabel>
         <Input

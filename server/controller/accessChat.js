@@ -15,7 +15,7 @@ const accessChat = async (req, res) => {
   try {
 
     const msgid = await pool.query(
-      `insert into messages (senderid,content,time) values (${req.body.user._id},'Kohli for a reason',current_timestamp)  RETURNING id;`
+      `insert into messages (senderid,content,time) values (${req.body.user._id},'${req.body.user.name} has started this chat',current_timestamp)  RETURNING id;`
     );
 
       // console.log(msgid.rows[0]);
@@ -158,7 +158,7 @@ const createGroup = async (req, res) => {
   try {
 
     const msgid = await pool.query(
-      `insert into messages (senderid,content,time) values (${req.body.admin._id},'Thala for a reason',current_timestamp)  RETURNING id;`
+      `insert into messages (senderid,content,time) values (${req.body.admin._id},'${req.body.admin.name} has created this group',current_timestamp)  RETURNING id;`
     );
 
       // console.log(msgid.rows[0]);
