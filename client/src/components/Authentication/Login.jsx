@@ -21,8 +21,9 @@ function Login() {
   const navigate = useNavigate();
 
   const handleClick = () => setshow(!show);
-  const handleSubmit = async () => {
-    setLoading(true);
+  const handleSubmit = async (event) => {
+    if(event.key==`Enter`){
+      setLoading(true);
     if (!email || !password) {
       toast({
         title: "Failed",
@@ -85,10 +86,13 @@ function Login() {
       console.log("Catched error");
       setLoading(false);
     }
+  }else{
+    return ;
+  }
   };
 
   return (
-    <VStack spacing={5}>
+    <VStack spacing={5} onKeyDown={handleSubmit}>
       <FormControl id="email" isRequired>
         <FormLabel>Email</FormLabel>
         <Input
