@@ -117,3 +117,28 @@ Input{
 .messages{
   overflow: scroll !important;
 }
+
+
+.time{
+  font-size: 0.7rem;
+  margin-left: 12px;
+  color: #3c3c3c;
+  font-weight: 350;
+ 
+}
+
+.wallpaper{
+ background-image: url("./Screenshot\ 2024-07-17\ 233629.png");
+  /* opacity: 0.1; */
+  background-size: contain;
+  /* background-position:; */
+  /* background-color: rgba(255, 255, 255, 0); 
+
+   */
+
+   /* background-color: #63000018; */
+  /* -webkit-backdrop-filter: blur(5px);
+
+  backdrop-filter: blur(5px); */
+
+}

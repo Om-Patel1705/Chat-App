@@ -9,7 +9,7 @@ import {
   useToast,
 } from "@chakra-ui/react";
 import { ChatState } from "../context/chatProvider";
-import { Box, Text } from "@chakra-ui/react";
+import { Box, Text } from"@chakra-ui/react";
 import { Getsender, GetsenderFull } from "./config/ChatLogics";
 import ProfileModal from "./miscellaneous/ProfileModal";
 import { Image } from "@chakra-ui/react";
@@ -19,17 +19,19 @@ import ScrollableChat from "./userAvatar/ScrollableChat";
 import Lottie from "react-lottie";
 import axios from "axios";
 import io from "socket.io-client"
+import DOMPurify from 'dompurify';
 
-const ENDPOINT = "https://chat-app-j34h.onrender.com";
+//const ENDPOINT = `http://localhost:3001`;
+ const ENDPOINT = `https://chat-app-j34h.onrender.com`;
 var socket, selectedChatCompare;
 
 const SingleChat = ({ fetchAgain, setFetchAgain }) => {
   const [Image1, seIm] = useState(
-    "https://cdn6.aptoide.com/imgs/1/2/2/1221bc0bdd2354b42b293317ff2adbcf_icon.png?w=128"
+    `https://cdn6.aptoide.com/imgs/1/2/2/1221bc0bdd2354b42b293317ff2adbcf_icon.png?w=128`
   );
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [newMessage, setNewMessage] = useState("");
+  const [newMessage, setNewMessage] = useState(``);
   const [socketConnected, setSocketConnected] = useState(false);
   const [typing, setTyping] = useState(false);
   const [istyping, setIsTyping] = useState(false);
@@ -38,7 +40,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
     ChatState();
 
   useEffect(() => {
-    console.log("Updated messages:", messages);
+    console.log(`Updated messages:`, messages);
   }, [messages]);
 
   const fetchMessages = async () => {
@@ -55,28 +57,28 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
       setLoading(true);
 
       const { data } = await axios.post(
-        "https://chat-app-j34h.onrender.com/api/message/all",
+        `${ENDPOINT}/api/message/all`,
         { selectedChat },
         config
       );
 
       setMessages(data);
       setLoading(false);
-      socket.emit("join chat", selectedChat.chatid);
+      socket.emit(`join chat`, selectedChat.chatid);
     } catch (error) {
       toast({
-        title: "Error Occurred!",
-        description: "Failed to Load the Messages",
-        status: "error",
+        title: `Error Occurred!`,
+        description: `Failed to Load the Messages`,
+        status: `error`,
         duration: 5000,
         isClosable: true,
-        position: "bottom",
+        position: `bottom`,
       });
     }
   };
 
   const sendMessage = async (event) => {
-    if (event.key === "Enter" && newMessage) {
+    if (event.key === `Enter` && newMessage) {
       try {
         const config = {
           headers: {
@@ -84,19 +86,24 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
             Authorization: `Bearer ${user.token}`,
           },
         };
-        setNewMessage("");
+
+        // const sanitizedMessage = DOMPurify.sanitize(newMessage);
+        const escapedMessage = newMessage.replace(/'/g, "\\'");
+        setNewMessage(``);
+
+        console.log(escapedMessage);
 
         const { data } = await axios.post(
-          "https://chat-app-j34h.onrender.com/api/message/",
+          `${ENDPOINT}/api/message/`,
           {
-            content: newMessage,
+            content: escapedMessage,
             chatId: selectedChat,
             sender: user,
           },
           config
         );
 
-        socket.emit("newMessage", { data, selectedChat });
+        socket.emit(`newMessage`, { data, selectedChat });
 
         startTransition(() => {
           setFetchAgain(!fetchAgain);
@@ -105,12 +112,12 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
       } catch (error) {
         console.log(error);
         toast({
-          title: "Error Occurred!",
-          description: "Failed to send the Message",
-          status: "error",
+          title: `Error Occurred!`,
+          description: `Failed to send the Message`,
+          status: `error`,
           duration: 5000,
           isClosable: true,
-          position: "bottom",
+          position: `bottom`,
         });
       }
     }
@@ -118,8 +125,8 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
 
   useEffect(() => {
     socket = io(ENDPOINT);
-    socket.emit("setup", user);
-    socket.on("connection", () => { setSocketConnected(true) });
+    socket.emit(`setup`, user);
+    socket.on(`connection`, () => { setSocketConnected(true) });
 
     return () => {
       socket.disconnect();
@@ -129,7 +136,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
   useEffect(() => {
     if (!socket) return;
 
-    socket.on("message received", (newMessageReceived) => {
+    socket.on(`message received`, (newMessageReceived) => {
       startTransition(() => {
         if (!selectedChatCompare || selectedChatCompare.chatid !== newMessageReceived.chatid) {
           if (!notification.includes(newMessageReceived)) {
@@ -144,7 +151,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
     });
 
     return () => {
-      socket.off("message received");
+      socket.off(`message received`);
     };
   }, [selectedChat, notification, fetchAgain]);
 
@@ -235,11 +242,12 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
             )}
           </Text>
           <Box
+          className="wallpaper"
             display="flex"
             flexDir="column"
             justifyContent="flex-end"
             p={3}
-            bg="#F8F8F8"
+            // bg="#F8F8F8"
             w="100%"
             h="100%"
             borderRadius="lg"
