@@ -79,7 +79,7 @@ const GroupChatModal = ({ children, fetchAgain, setFetchAgain }) => {
         },
       };
       const { data } = await axios.post(
-        `https://chat-app-j34h.onrender.com/api/chat/search`,
+        `${ENDPOINT}/api/chat/search`,
         { searchUser: query, user: user },
         config
       );
@@ -131,7 +131,7 @@ const GroupChatModal = ({ children, fetchAgain, setFetchAgain }) => {
         },
       };
       var { data } = await axios.post(
-        `https://chat-app-j34h.onrender.com/api/chat/group`,
+        `${ENDPOINT}/api/chat/group`,
         {
           name: groupChatName,
           users: selectedUsers,

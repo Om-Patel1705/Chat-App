@@ -7,44 +7,37 @@ import { Avatar, Image } from "@chakra-ui/react";
 import React, { useState, useEffect, startTransition } from "react";
 //import { getSender } from "../config/ChatLogics";
 import ChatLoading from "./ChatLoading";
-import "../index.css"
+import "../index.css";
 //import GroupChatModal from "./miscellaneous/GroupChatModal";
 import { Button } from "@chakra-ui/react";
 import { ChatState } from "../context/chatProvider.js";
 import { Getsender, GetsenderFull } from "./config/ChatLogics.js";
 import GroupChatModal from "./miscellaneous/GroupChatModal.js";
+import CryptoJS from "crypto-js";
 
+// const ENDPOINT = `http://localhost:3001`;
+const ENDPOINT = `https://chat-app-j34h.onrender.com`;
 
-
-
-
-
-
-
-
-const MyChats = ({ fetchAgain ,setFetchAgain}) => {
-  
-  const { selectedChat, setSelectedChat, user, chats, setChats} = ChatState();
+const MyChats = ({ fetchAgain, setFetchAgain }) => {
+  const { selectedChat, setSelectedChat, user, chats, setChats } = ChatState();
   const you = "You";
   const [loggedUser, setLoggedUser] = useState();
   const [Image1, seIm] = useState(
     "https://cdn6.aptoide.com/imgs/1/2/2/1221bc0bdd2354b42b293317ff2adbcf_icon.png?w=128"
   );
   const [chatnames, setChatnames] = useState([]);
-  
+
   const toast = useToast();
-  
-  console.log(selectedChat);
-  
+
+  // console.log(selectedChat);
+
   // if(x)setChats(x);
 
-
   const listUsers = async () => {
-
-    console.log(selectedChat);
+    // console.log(selectedChat);
 
     try {
-      const response = await fetch("https://chat-app-j34h.onrender.com/api/chat/listout", {
+      const response = await fetch(`${ENDPOINT}/api/chat/listout`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -53,14 +46,26 @@ const MyChats = ({ fetchAgain ,setFetchAgain}) => {
         body: JSON.stringify({ user }),
       });
       const data = await response.json();
-       console.log(data);
-      
-        // setChatnames(data);
-        setChats(data);
+      //  console.log(data);
 
-      
+      // setChatnames(data);
+
+     
+        for (var i = 0; i < data.length; i++) {
+
+          try{
+          const byt = CryptoJS.AES.decrypt(
+            data[i].content,
+            process.env.REACT_APP_MESSAGE_SECRET
+          );
+          const x = JSON.parse(byt.toString(CryptoJS.enc.Utf8));
+          data[i].content = x;}
+          catch(err){}
+        }
+    
+
+      setChats(data);
     } catch (error) {
-      
       console.error("Error fetching chatnames:", error);
       toast({
         title: "Error Occured!",
@@ -77,7 +82,6 @@ const MyChats = ({ fetchAgain ,setFetchAgain}) => {
     setLoggedUser(user);
     listUsers();
   }, [fetchAgain]);
-
 
   // useEffect((e)=>{
   //   console.log("Chat is changed")
@@ -105,9 +109,7 @@ const MyChats = ({ fetchAgain ,setFetchAgain}) => {
         alignItems="center"
       >
         My Chats
-        <GroupChatModal  
-                   fetchAgain={fetchAgain}
-                    setFetchAgain={setFetchAgain} >
+        <GroupChatModal fetchAgain={fetchAgain} setFetchAgain={setFetchAgain}>
           <Button
             display="flex"
             fontSize={{ base: "17px", md: "10px", lg: "17px" }}
@@ -140,7 +142,9 @@ const MyChats = ({ fetchAgain ,setFetchAgain}) => {
                   display="flex"
                   onClick={() => setSelectedChat(chat)}
                   cursor="pointer"
-                  bg={selectedChat.chatid == chat.chatid ? "#38B2AC" : "#E8E8E8"}
+                  bg={
+                    selectedChat.chatid == chat.chatid ? "#38B2AC" : "#E8E8E8"
+                  }
                   color={selectedChat.chatid == chat.chatid ? "white" : "black"}
                   px={3}
                   py={2}
@@ -149,17 +153,16 @@ const MyChats = ({ fetchAgain ,setFetchAgain}) => {
                 >
                   {!chat.isgroup ? (
                     <Avatar
-                  mt="7px"
-                  mr={1}
-                  size="sm"
-                  cursor="pointer"
-                  
-                  name={GetsenderFull(chat).username}
-                  src={GetsenderFull(chat).pic}
-                />
+                      mt="7px"
+                      mr={1}
+                      size="sm"
+                      cursor="pointer"
+                      name={GetsenderFull(chat).username}
+                      src={GetsenderFull(chat).pic}
+                    />
                   ) : (
                     <Image
-                    className="llll"
+                      className="llll"
                       borderRadius="full"
                       boxSize="50px"
                       src={Image1}
@@ -184,7 +187,6 @@ const MyChats = ({ fetchAgain ,setFetchAgain}) => {
                         {chat.content.length > 30
                           ? chat.content.substring(0, 30) + "..."
                           : chat.content}
-                         
                       </Text>
                     )}
                   </Box>
@@ -199,9 +201,5 @@ const MyChats = ({ fetchAgain ,setFetchAgain}) => {
     </Box>
   );
 };
-
-
-
-
 
 export default MyChats;

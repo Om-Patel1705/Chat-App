@@ -9,10 +9,45 @@ import {
 } from "../config/ChatLogics";
 import { ChatState } from "../../context/chatProvider";
 import "../../index.css"
+import { useState } from "react";
+import CryptoJS from "crypto-js";
+// const { config } = require("dotenv");
+// require("dotenv").config();
+// config();
+
+
+
+
 
 const ScrollableChat = ({ messages }) => {
+  const [lastDate,setLastDate] = useState();
   const { user } = ChatState();
+
+//   const newm = messages;
+//     newm.map((i,m)=>{
+//       const byt =CryptoJS.AES.decrypt(m.content,process.env.REACT_APP_MESSAGE_SECRET);
+//       const x = JSON.parse(byt.toString(CryptoJS.enc.Utf8))
+//        newm.content = x;
+
+//     })
+// console.log(newm);
+
+
+
+
+      
+
+      for(var i =1 ;i<messages.length;i++){
+       try{ const byt =CryptoJS.AES.decrypt(messages[i].content,process.env.REACT_APP_MESSAGE_SECRET);
+        const x = JSON.parse(byt.toString(CryptoJS.enc.Utf8))
+        messages[i].content = x;}
+        catch(err){}
+      }
+    
+  
 const xx = "     ";
+
+
   return (
     <ScrollableFeed >
       {messages &&
@@ -33,6 +68,7 @@ const xx = "     ";
               </Tooltip>
             )}
             <span
+                className="shadow"
               style={{
                 backgroundColor: `${
                   m.senderid === user._id ? "#97d9ff" : "#97f3bb"

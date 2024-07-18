@@ -22,6 +22,9 @@ import UserBadgeItem from "../userAvatar/userBadgeItem";
 import axios from "axios";
 import UserListItem from "../userAvatar/userListItem";
 
+// const ENDPOINT = `http://localhost:3001`;
+const ENDPOINT = `https://chat-app-j34h.onrender.com`;
+
 const UpdateGroupChatModal = ({fetchMessages, fetchAgain, setFetchAgain }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { user,setUser ,selectedChat, setSelectedChat } = ChatState();
@@ -45,7 +48,7 @@ const UpdateGroupChatModal = ({fetchMessages, fetchAgain, setFetchAgain }) => {
         },
       };
       const { data } = await axios.put(
-        `https://chat-app-j34h.onrender.com/api/chat/rename`,
+        `${ENDPOINT}/api/chat/rename`,
         {
           oldchat: selectedChat,
           newName: groupChatName,
@@ -115,7 +118,7 @@ const handleAddUser = async (user1) => {
         },
       };
       const { data } = await axios.put(
-        `https://chat-app-j34h.onrender.com/api/chat/groupadd`,
+        `${ENDPOINT}/api/chat/groupadd`,
         {
           oldchat: selectedChat,
           userID: user1.id,
@@ -156,7 +159,7 @@ const handleAddUser = async (user1) => {
         },
 
       };
-      const { data } = await axios.post(`https://chat-app-j34h.onrender.com/api/chat/search`,{searchUser:query,user:user}, config);
+      const { data } = await axios.post(`${ENDPOINT}/api/chat/search`,{searchUser:query,user:user}, config);
       // console.log(data);
       setLoading(false);
       setSearchResult(data);
@@ -196,7 +199,7 @@ const handleAddUser = async (user1) => {
         },
       };
       const { data } = await axios.put(
-        `https://chat-app-j34h.onrender.com/api/chat/groupremove`,
+        `${ENDPOINT}/api/chat/groupremove`,
         {
           oldchat: selectedChat,
           userId: user1.id,
