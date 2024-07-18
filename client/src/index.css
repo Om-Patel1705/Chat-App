@@ -131,14 +131,11 @@ Input{
  background-image: url("./Screenshot\ 2024-07-17\ 233629.png");
   /* opacity: 0.1; */
   background-size: contain;
-  /* background-position:; */
-  /* background-color: rgba(255, 255, 255, 0); 
+ 
 
-   */
+}
 
-   /* background-color: #63000018; */
-  /* -webkit-backdrop-filter: blur(5px);
 
-  backdrop-filter: blur(5px); */
-
+.shadow{
+  box-shadow: 0 7px 15px 0 rgba(0, 0, 0, .13), 0 1px 4px 0 rgba(0, 0, 0, .11);
 }

@@ -9,7 +9,7 @@ import {
   useToast,
 } from "@chakra-ui/react";
 import { ChatState } from "../context/chatProvider";
-import { Box, Text } from"@chakra-ui/react";
+import { Box, Text } from "@chakra-ui/react";
 import { Getsender, GetsenderFull } from "./config/ChatLogics";
 import ProfileModal from "./miscellaneous/ProfileModal";
 import { Image } from "@chakra-ui/react";
@@ -19,13 +19,27 @@ import ScrollableChat from "./userAvatar/ScrollableChat";
 import Lottie from "react-lottie";
 import axios from "axios";
 import io from "socket.io-client"
-import DOMPurify from 'dompurify';
+import CryptoJS from "crypto-js"
+
+// import config from "dotenv"
+// import DOMPurify from "dotenv";
+
+// require("dotenv").config();
+// config();
+
+// const Cryptr = require('cryptr');
+// const cryptr = new Cryptr('myTotallySecretKey');
+
+// import Cryptr from "cryptr"
 
 // const ENDPOINT = `http://localhost:3001`;
- const ENDPOINT = `https://chat-app-j34h.onrender.com`;
+const ENDPOINT = `https://chat-app-j34h.onrender.com`;
 var socket, selectedChatCompare;
 
 const SingleChat = ({ fetchAgain, setFetchAgain }) => {
+
+
+
   const [Image1, seIm] = useState(
     `https://cdn6.aptoide.com/imgs/1/2/2/1221bc0bdd2354b42b293317ff2adbcf_icon.png?w=128`
   );
@@ -36,11 +50,12 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
   const [typing, setTyping] = useState(false);
   const [istyping, setIsTyping] = useState(false);
   const toast = useToast();
+  // const [encryptedMessage,setEncrypted] = useState("");
   const { selectedChat, setSelectedChat, user, notification, setNotification } =
     ChatState();
 
   useEffect(() => {
-    console.log(`Updated messages:`, messages);
+    // console.log(`Updated messages:`, messages);
   }, [messages]);
 
   const fetchMessages = async () => {
@@ -89,14 +104,25 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
 
         // const sanitizedMessage = DOMPurify.sanitize(newMessage);
         const escapedMessage = newMessage.replace(/'/g, "\\'");
+       const encrypteMessage = CryptoJS.AES.encrypt(
+        JSON.stringify(escapedMessage),
+        process.env.REACT_APP_MESSAGE_SECRET).toString();
+
+        // console.log(encrypteMessage);
+
+        // const byte = CryptoJS.AES.decrypt(encrypteMessage,process.env.REACT_APP_MESSAGE_SECRET)
+        
+        // const x = JSON.parse(CryptoJS.AES.decrypt(encrypteMessage,process.env.REACT_APP_MESSAGE_SECRET).toString(CryptoJS.enc.Utf8))
+        // console.log(x);
+       
         setNewMessage(``);
 
-        console.log(escapedMessage);
+        // console.log(encrypteMessage);
 
         const { data } = await axios.post(
           `${ENDPOINT}/api/message/`,
           {
-            content: escapedMessage,
+            content: encrypteMessage,
             chatId: selectedChat,
             sender: user,
           },
@@ -126,7 +152,9 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
   useEffect(() => {
     socket = io(ENDPOINT);
     socket.emit(`setup`, user);
-    socket.on(`connection`, () => { setSocketConnected(true) });
+    socket.on(`connection`, () => {
+      setSocketConnected(true);
+    });
 
     return () => {
       socket.disconnect();
@@ -138,7 +166,10 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
 
     socket.on(`message received`, (newMessageReceived) => {
       startTransition(() => {
-        if (!selectedChatCompare || selectedChatCompare.chatid !== newMessageReceived.chatid) {
+        if (
+          !selectedChatCompare ||
+          selectedChatCompare.chatid !== newMessageReceived.chatid
+        ) {
           if (!notification.includes(newMessageReceived)) {
             setNotification([newMessageReceived, ...notification]);
             setFetchAgain(!fetchAgain);
@@ -204,30 +235,28 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
             />
             {!selectedChat.isgroup ? (
               <>
-              <Avatar
+                <Avatar
                   ml={2}
                   mr={2}
                   className="llll"
-                   boxSize="50px"
-                   bg="#2abaf7"
-                 
+                  boxSize="50px"
+                  bg="#2abaf7"
                   name={GetsenderFull(selectedChat).username}
                   src={GetsenderFull(selectedChat).pic}
                 />
 
-                {"  "+GetsenderFull(selectedChat).username}
+                {"  " + GetsenderFull(selectedChat).username}
                 <div className="photo">
                   <ProfileModal user={GetsenderFull(selectedChat)} />
                 </div>
               </>
             ) : (
               <>
-              <Avatar
+                <Avatar
                   ml={2}
                   mr={2}
                   className="llll"
-                   boxSize="50px"
-                 
+                  boxSize="50px"
                   name={GetsenderFull(selectedChat).username}
                   src={Image1}
                 />
@@ -242,7 +271,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
             )}
           </Text>
           <Box
-          className="wallpaper"
+            className="wallpaper"
             display="flex"
             flexDir="column"
             justifyContent="flex-end"
@@ -254,12 +283,23 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
             overflowY="scroll"
           >
             {loading ? (
-              <Spinner size="xl" w={20} h={20} alignSelf="center" margin="auto" />
+              <Spinner
+                size="xl"
+                w={20}
+                h={20}
+                alignSelf="center"
+                margin="auto"
+              />
             ) : (
               <ScrollableChat messages={messages} />
             )}
 
-            <FormControl onKeyDown={sendMessage} id="first-name" isRequired mt={3}>
+            <FormControl
+              onKeyDown={sendMessage}
+              id="first-name"
+              isRequired
+              mt={3}
+            >
               {istyping ? (
                 <div>
                   <Lottie
@@ -281,7 +321,12 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
           </Box>
         </>
       ) : (
-        <Box display="flex" alignItems="center" justifyContent="center" h="100%">
+        <Box
+          display="flex"
+          alignItems="center"
+          justifyContent="center"
+          h="100%"
+        >
           <Text>Click on a user to start chatting</Text>
         </Box>
       )}

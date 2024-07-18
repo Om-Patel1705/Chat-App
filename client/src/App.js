@@ -3,7 +3,7 @@ import {  lazy } from "react";
 import "./index.css";
 import { Routes, Route } from "react-router-dom";
 import Chats from "./pages/Chats";
-
+// import env from "react-dotenv";
 
 const Home = lazy(() => import("./pages/Home"));
 
@@ -11,6 +11,8 @@ const Home = lazy(() => import("./pages/Home"));
 //const socket = io.connect("https://chat-app-j34h.onrender.com");
 
 function App() {
+
+
   return (
     
  
