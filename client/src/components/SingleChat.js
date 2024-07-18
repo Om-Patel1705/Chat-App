@@ -9,7 +9,7 @@ import {
   useToast,
 } from "@chakra-ui/react";
 import { ChatState } from "../context/chatProvider";
-import { Box, Text } from"@chakra-ui/react";
+import { Box, Text } from "@chakra-ui/react";
 import { Getsender, GetsenderFull } from "./config/ChatLogics";
 import ProfileModal from "./miscellaneous/ProfileModal";
 import { Image } from "@chakra-ui/react";
@@ -19,7 +19,15 @@ import ScrollableChat from "./userAvatar/ScrollableChat";
 import Lottie from "react-lottie";
 import axios from "axios";
 import io from "socket.io-client"
-import DOMPurify from 'dompurify';
+import DOMPurify from "dotenv";
+
+// require("dotenv").config();
+// config();
+
+// import 'dotenv/config'
+
+
+
 
 // const ENDPOINT = `http://localhost:3001`;
  const ENDPOINT = `https://chat-app-j34h.onrender.com`;
