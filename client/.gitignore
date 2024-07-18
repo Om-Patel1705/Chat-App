@@ -17,6 +17,12 @@
 .env.development.local
 .env.test.local
 .env.production.local
+.env.staging
+.env
+
+git rm env.local --cached
+git rm env.staging --cached
+git commit -m "Stopped tracking env.local, and env.staging"
 
 npm-debug.log*
 yarn-debug.log*

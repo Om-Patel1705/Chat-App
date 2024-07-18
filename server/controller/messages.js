@@ -16,9 +16,9 @@ const addMessage = async (req, res) => {
       `insert into messages (content,senderid,time,chatid)  values('${content}',${sender._id},CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Kolkata',${chatId.chatid}) returning id`
     );
     const data = await pool.query(
-      `SELECT id, content, senderid, to_char(time AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Kolkata', 'HH24:MI') AS time, chatid
-FROM messages
-WHERE id = ${msgid.rows[0].id};`
+      `SELECT id, content, senderid, to_char(time , 'HH24:MI') AS time, chatid
+       FROM messages
+       WHERE id = ${msgid.rows[0].id};`
     );
 
     await pool.query(
@@ -37,7 +37,7 @@ const allMessages = async (req, res) => {
   try {
     const data = await pool.query(
       // `select * from (select * from messages where chatid=${chatid} ) as r1 join users as u on u.id=r1.senderid ORDER BY time`
-      `select * from (SELECT id, content, senderid, to_char(time AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Kolkata', 'HH24:MI') AS time, chatid from messages where chatid=${chatid} ) as r1 join users as u on u.id=r1.senderid ORDER BY time`
+      `select * from (SELECT id, content, senderid, to_char(time , 'HH24:MI') AS time, chatid from messages where chatid=${chatid} ) as r1 join users as u on u.id=r1.senderid ORDER BY time`
     );
 
     //  console.log(chatid);
