@@ -13,13 +13,13 @@ import { Box, Text } from "@chakra-ui/react";
 import { Getsender, GetsenderFull } from "./config/ChatLogics";
 import ProfileModal from "./miscellaneous/ProfileModal";
 import { Image } from "@chakra-ui/react";
-import { ArrowBackIcon } from "@chakra-ui/icons";
+import { ArrowBackIcon, ArrowForwardIcon } from "@chakra-ui/icons";
 import UpdateGroupChatModal from "./miscellaneous/UpdateGroupChatModal";
 import ScrollableChat from "./userAvatar/ScrollableChat";
 import Lottie from "react-lottie";
 import axios from "axios";
-import io from "socket.io-client"
-import CryptoJS from "crypto-js"
+import io from "socket.io-client";
+import CryptoJS from "crypto-js";
 
 // import config from "dotenv"
 // import DOMPurify from "dotenv";
@@ -37,9 +37,6 @@ const ENDPOINT = `https://chat-app-j34h.onrender.com`;
 var socket, selectedChatCompare;
 
 const SingleChat = ({ fetchAgain, setFetchAgain }) => {
-
-
-
   const [Image1, seIm] = useState(
     `https://cdn6.aptoide.com/imgs/1/2/2/1221bc0bdd2354b42b293317ff2adbcf_icon.png?w=128`
   );
@@ -92,60 +89,73 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
     }
   };
 
-  const sendMessage = async (event) => {
+  const enter = (event) => {
     if (event.key === `Enter` && newMessage) {
-      try {
-        const config = {
-          headers: {
-            "Content-type": "application/json",
-            Authorization: `Bearer ${user.token}`,
-          },
-        };
+      sendMessage();
+    }
 
-        // const sanitizedMessage = DOMPurify.sanitize(newMessage);
-        const escapedMessage = newMessage.replace(/'/g, "\\'");
-       const encrypteMessage = CryptoJS.AES.encrypt(
+    
+  };
+
+  const click = () => {
+
+    if(newMessage)
+    sendMessage();
+  };
+
+  const sendMessage = async () => {
+    try {
+      const config = {
+        headers: {
+          "Content-type": "application/json",
+          Authorization: `Bearer ${user.token}`,
+        },
+      };
+
+      // const sanitizedMessage = DOMPurify.sanitize(newMessage);
+      const escapedMessage = newMessage.replace(/'/g, "\\'");
+      const encrypteMessage = CryptoJS.AES.encrypt(
         JSON.stringify(escapedMessage),
-        process.env.REACT_APP_MESSAGE_SECRET).toString();
+        process.env.REACT_APP_MESSAGE_SECRET
+      ).toString();
 
-        // console.log(encrypteMessage);
+      // console.log(encrypteMessage);
 
-        // const byte = CryptoJS.AES.decrypt(encrypteMessage,process.env.REACT_APP_MESSAGE_SECRET)
-        
-        // const x = JSON.parse(CryptoJS.AES.decrypt(encrypteMessage,process.env.REACT_APP_MESSAGE_SECRET).toString(CryptoJS.enc.Utf8))
-        // console.log(x);
-       
-        setNewMessage(``);
+      // const byte = CryptoJS.AES.decrypt(encrypteMessage,process.env.REACT_APP_MESSAGE_SECRET)
 
-        // console.log(encrypteMessage);
+      // const x = JSON.parse(CryptoJS.AES.decrypt(encrypteMessage,process.env.REACT_APP_MESSAGE_SECRET).toString(CryptoJS.enc.Utf8))
+      // console.log(x);
 
-        const { data } = await axios.post(
-          `${ENDPOINT}/api/message/`,
-          {
-            content: encrypteMessage,
-            chatId: selectedChat,
-            sender: user,
-          },
-          config
-        );
+      setNewMessage(``);
 
-        socket.emit(`newMessage`, { data, selectedChat });
+      // console.log(encrypteMessage);
 
-        startTransition(() => {
-          setFetchAgain(!fetchAgain);
-          setMessages((prevMessages) => [...prevMessages, data]);
-        });
-      } catch (error) {
-        console.log(error);
-        toast({
-          title: `Error Occurred!`,
-          description: `Failed to send the Message`,
-          status: `error`,
-          duration: 5000,
-          isClosable: true,
-          position: `bottom`,
-        });
-      }
+      const { data } = await axios.post(
+        `${ENDPOINT}/api/message/`,
+        {
+          content: encrypteMessage,
+          chatId: selectedChat,
+          sender: user,
+        },
+        config
+      );
+
+      socket.emit(`newMessage`, { data, selectedChat });
+
+      startTransition(() => {
+        setFetchAgain(!fetchAgain);
+        setMessages((prevMessages) => [...prevMessages, data]);
+      });
+    } catch (error) {
+      console.log(error);
+      toast({
+        title: `Error Occurred!`,
+        description: `Failed to send the Message`,
+        status: `error`,
+        duration: 5000,
+        isClosable: true,
+        position: `bottom`,
+      });
     }
   };
 
@@ -295,7 +305,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
             )}
 
             <FormControl
-              onKeyDown={sendMessage}
+              onKeyDown={enter}
               id="first-name"
               isRequired
               mt={3}
@@ -309,14 +319,23 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
                   />
                 </div>
               ) : null}
-              <Input
-                variant="filled"
-                bg="#E0E0E0"
-                placeholder="Enter a message.."
-                value={newMessage}
-                onChange={typingHandler}
-                autoComplete="off"
-              />
+
+              <Box display="flex">
+                <Input
+                  variant="filled"
+                  bg="#E0E0E0"
+                  placeholder="Enter a message.."
+                  value={newMessage}
+                  onChange={typingHandler}
+                  autoComplete="off"
+                ></Input>
+                <IconButton
+                  ml={2}
+                  d={{ base: "flex", md: "none" }}
+                  icon={<ArrowForwardIcon />}
+                  onClick={() => click()}
+                />
+              </Box>
             </FormControl>
           </Box>
         </>
