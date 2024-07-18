@@ -158,7 +158,7 @@ const createGroup = async (req, res) => {
   try {
 
     const msgid = await pool.query(
-      `insert into messages (senderid,content,time) values (${req.body.admin._id},'${req.body.admin.name} has created this group',current_timestamp)  RETURNING id;`
+      `insert into messages (senderid,content,time) values (${req.body.admin._id},'${req.body.admin.name} has created this group',CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Kolkata')  RETURNING id;`
     );
 
       // console.log(msgid.rows[0]);
