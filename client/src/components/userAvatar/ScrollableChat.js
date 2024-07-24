@@ -56,6 +56,7 @@ const xx = "     ";
             {(isSameSender(messages, m, i, user._id) ||
               isLastMessage(messages, i, user._id)) && (
               <Tooltip label={m.username} placement="bottom-start" hasArrow>
+              
                 <Avatar
                   mt="12px"
                   mr={1}
