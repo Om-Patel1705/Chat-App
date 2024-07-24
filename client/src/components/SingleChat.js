@@ -8,6 +8,7 @@ import {
   Spinner,
   useToast,
 } from "@chakra-ui/react";
+
 import { ChatState } from "../context/chatProvider";
 import { Box, Text } from "@chakra-ui/react";
 import { Getsender, GetsenderFull } from "./config/ChatLogics";
@@ -20,6 +21,11 @@ import Lottie from "react-lottie";
 import axios from "axios";
 import io from "socket.io-client";
 import CryptoJS from "crypto-js";
+import { dotStream } from "ldrs";
+
+dotStream.register();
+
+// Default values shown
 
 // import config from "dotenv"
 // import DOMPurify from "dotenv";
@@ -93,14 +99,10 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
     if (event.key === `Enter` && newMessage) {
       sendMessage();
     }
-
-    
   };
 
   const click = () => {
-
-    if(newMessage)
-    sendMessage();
+    if (newMessage) sendMessage();
   };
 
   const sendMessage = async () => {
@@ -293,23 +295,19 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
             overflowY="scroll"
           >
             {loading ? (
-              <Spinner
-                size="xl"
-                w={20}
-                h={20}
-                alignSelf="center"
-                margin="auto"
-              />
+              <Box    alignSelf="center"
+                margin="auto">
+                <l-dot-stream
+                  size="100"
+                  speed="2.5"
+                  color="white"
+                ></l-dot-stream>
+              </Box>
             ) : (
               <ScrollableChat messages={messages} />
             )}
 
-            <FormControl
-              onKeyDown={enter}
-              id="first-name"
-              isRequired
-              mt={3}
-            >
+            <FormControl onKeyDown={enter} id="first-name" isRequired mt={3}>
               {istyping ? (
                 <div>
                   <Lottie

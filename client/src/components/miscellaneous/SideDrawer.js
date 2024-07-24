@@ -30,9 +30,13 @@ import ProfileModal from "./ProfileModal";
 //  import { getSender } from "../../config/ChatLogics";
 import UserListItem from "../userAvatar/userListItem";
 import { ChatState } from "../../context/chatProvider";
+import Image1 from "./chat-bubble.png";
 import { json, useNavigate } from "react-router-dom";
 import chatlogo from "../../utils/reshot-icon-messenger-82S9U6ZBLD.svg";
 import { io } from "socket.io-client";
+import { dotStream } from "ldrs";
+
+dotStream.register();
 // const ENDPOINT = `http://localhost:3001`;
 const ENDPOINT = "https://chat-app-j34h.onrender.com";
 var socket, selectedChatCompare;
@@ -216,16 +220,18 @@ data = tempdata;
             </Text>
           </Button>
         </Tooltip>
-        <Text>😀</Text>
+        <Box  boxSize="40px">
+        <img className="llll" src={Image1}  alt="Example" />
+        </Box>
         <div>
           <Menu>
-            <MenuButton p={1}>
+            {/* <MenuButton p={1}>
               {/* <NotificationBadge
                 count={notification.length}
                 effect={Effect.SCALE}
-              /> */}
+              /> 
               <BellIcon fontSize="2xl" m={1} />
-            </MenuButton>
+            </MenuButton> */}
             {/* <MenuList pl={2}>
               {!notification.length && "No New Messages"}
               {notification.map((notif) => (
@@ -287,7 +293,15 @@ data = tempdata;
                 />
               ))
             )}
-            {loadingChat && <Spinner ml="auto" display="flex" />}
+            {loadingChat &&  
+            <Box    alignSelf="center"
+                margin="auto">
+                <l-dot-stream
+                  size="100"
+                  speed="2.5"
+                  color="white"
+                ></l-dot-stream>
+              </Box>}
           </DrawerBody>
         </DrawerContent>
       </Drawer>
