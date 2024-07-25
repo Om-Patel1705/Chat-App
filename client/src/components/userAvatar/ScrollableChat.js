@@ -60,11 +60,10 @@ const xx = "     ";
                 <Avatar
                   mt="12px"
                   mr={1}
-                  
                   size="sm"
                   cursor="pointer"
                   name={m.username}
-                  // src={m.pic}
+                   src={m.pic}
                 />
               </Tooltip>
             )}
