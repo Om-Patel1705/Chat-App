@@ -52,12 +52,14 @@ const ScrollableChat = ({ messages }) => {
                 <div
                   className="xx"
                   style={{
-                    marginBottom: isSameUser(messages, m, i, user._id) ? 6 : 0,
-                    marginTop: isSameUser(messages, m, i, user._id) ? 0 : 12,
+                    // paddingTop:isSameUser(messages, m, i, user._id) ? 3 : 0,
+                    marginTop: isSameUser(messages, m, i, user._id) ? 3 : 12,
                   }}
                 >
                   <Avatar
+                  
                     mr={1}
+                    
                     size="sm"
                     cursor="pointer"
                     name={m.username}
@@ -73,8 +75,8 @@ const ScrollableChat = ({ messages }) => {
                   m.senderid === user._id ? "#97d9ff" : "#97f3bb"
                 }`,
                 marginLeft: isSameSenderMargin(messages, m, i, user._id),
-                marginTop: isSameUser(messages, m, i, user._id) ? 3 : 10,
-                marginBottom: isSameUser(messages, m, i, user._id) ? 10 : 0,
+                marginTop: isSameUser(messages, m, i, user._id) ? 3 : 15,
+                marginBottom: isSameUser(messages, m, i, user._id) ? 0 : 0,
                 borderRadius: "6px",
                 padding: "5px 15px",
                 maxWidth: "75%",
