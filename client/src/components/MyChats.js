@@ -142,9 +142,9 @@ const MyChats = ({ fetchAgain, setFetchAgain }) => {
                   display="flex"
                   onClick={() => setSelectedChat(chat)}
                   cursor="pointer"
-                  bg={
-                    selectedChat.chatid == chat.chatid ? "#38B2AC" : "#E8E8E8"
-                  }
+                  
+                   className = {selectedChat.chatid == chat.chatid ? "grad" : "normal"}
+                  
                   color={selectedChat.chatid == chat.chatid ? "white" : "black"}
                   px={3}
                   py={2}
