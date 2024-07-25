@@ -75,9 +75,10 @@ const xx = "     ";
                 }`,
                 marginLeft: isSameSenderMargin(messages, m, i, user._id),
                 marginTop: isSameUser(messages, m, i, user._id) ? 3 : 10,
-                borderRadius: "20px",
+                borderRadius: "6px",
                 padding: "5px 15px",
                 maxWidth: "75%",
+                paddingRight:"50px",
               }}
             >
               {m.content}

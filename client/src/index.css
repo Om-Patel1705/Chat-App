@@ -125,6 +125,12 @@ Input{
   margin-left: 12px;
   color: #3c3c3c;
   font-weight: 350;
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  padding: 5px;
+  padding-bottom: 0;
+
  
 }
 
@@ -139,4 +145,6 @@ Input{
 
 .shadow{
   box-shadow: 0 7px 15px 0 rgba(0, 0, 0, .13), 0 1px 4px 0 rgba(0, 0, 0, .11);
+  position: relative;
+  
 }
