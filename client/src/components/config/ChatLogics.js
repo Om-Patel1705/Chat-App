@@ -52,7 +52,7 @@ const isLastMessage = (messages, i, userId) => {
     messages[i + 1].senderid === m.senderid &&
     messages[i].senderid !== userId
   )
-    return 33;
+    return 36;
   else if (
     (i < messages.length - 1 &&
       messages[i + 1].senderid !== m.senderid &&
