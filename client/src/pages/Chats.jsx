@@ -66,7 +66,7 @@ function Chats() {
   return (
     <div style={{ width: "100%" }}>
     {user && <SideDrawer  fetchAgain={fetchAgain} setFetchAgain={setFetchAgain}/>}
-    <Box  display="flex" flexDir="row" justifyContent="space-between" w="100%" h="91.5vh" p="10px" className="lol" >
+    <Box  display="flex" flexDir="row" justifyContent="space-between" w="100%" h="91.5vh" p="10px" className="lol"  >
       {user && <MyChats fetchAgain={fetchAgain} setFetchAgain={setFetchAgain}/>}
       {user && (
         <Chatbox fetchAgain={fetchAgain} setFetchAgain={setFetchAgain} />
