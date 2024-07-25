@@ -2,8 +2,7 @@ const asyncHandler = require("express-async-handler");
 const generateToken = require("../config/generateToken");
 const bcrypt = require("bcryptjs");
 const pool = require("../config/db");
-const  v2= require("./cloud");
-
+const cloudinary = require("./cloud");
 // const ImageCompressor = require('image-compressor');
 
 const registerUser = asyncHandler(async (req, res) => {
@@ -12,7 +11,7 @@ const registerUser = asyncHandler(async (req, res) => {
   try {
     // console.log(preview);
 
-    pic = await v2.uploader.upload(preview, {
+    pic = await cloudinary.uploader.upload(preview, {
       folder: "/user_DP",
     });
 

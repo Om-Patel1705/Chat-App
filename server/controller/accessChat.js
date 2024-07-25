@@ -15,7 +15,7 @@ const accessChat = async (req, res) => {
   try {
 
     const msgid = await pool.query(
-      `insert into messages (senderid,content,time) values (${req.body.user._id},'${req.body.user.name} has started this chat',current_timestamp)  RETURNING id;`
+      `insert into messages (senderid,content,time) values (${req.body.user._id},'${req.body.user.name} has started this chat',CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Kolkata')  RETURNING id;`
     );
 
       // console.log(msgid.rows[0]);

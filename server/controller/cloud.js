@@ -6,5 +6,6 @@ v2.config({
     api_secret:"AiaeeqA62Ir-lw5VyFbPGIwSyss"
 });
 
+const cloudinary=v2;
 
-module.exports= v2;
+module.exports= cloudinary;
