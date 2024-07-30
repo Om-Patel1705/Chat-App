@@ -16,7 +16,7 @@ import CryptoJS from "crypto-js";
 // config();
 
 const ScrollableChat = ({ messages }) => {
-  const [lastDate, setLastDate] = useState();
+  // const [lastDate, setLastDate] = useState();
   const { user } = ChatState();
 
   //   const newm = messages;
