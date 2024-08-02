@@ -9,14 +9,14 @@ const addMessage = async (req, res) => {
 
   content = content.replace(/\\'/g, "''");
   console.log("reached addMessage");
-  console.log(content);
+  // console.log(content);
 
   try {
     const msgid = await pool.query(
       `insert into messages (content,senderid,time,chatid)  values('${content}',${sender._id},CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Kolkata',${chatId.chatid}) returning id`
     );
     const data = await pool.query(
-      `SELECT id, content, senderid, to_char(time , 'HH24:MI') AS time, chatid
+      `SELECT id, content, senderid, to_char(time , 'HH24:MI') AS time1, to_char(time, 'DD-MM-YYYY') as date, chatid
        FROM messages
        WHERE id = ${msgid.rows[0].id};`
     );
@@ -37,13 +37,13 @@ const allMessages = async (req, res) => {
   try {
     const data = await pool.query(
       // `select * from (select * from messages where chatid=${chatid} ) as r1 join users as u on u.id=r1.senderid ORDER BY time`
-      `select * from (SELECT id, content, senderid, to_char(time , 'HH24:MI') AS time, chatid from messages where chatid=${chatid} ) as r1 join users as u on u.id=r1.senderid ORDER BY time`
+      `select * from (SELECT id, content, senderid,time, to_char(time , 'HH24:MI') AS time1,to_char(time, 'DD-MM-YYYY') as date , chatid from messages where chatid=${chatid} ) as r1 join users as u on u.id=r1.senderid ORDER BY time`
     );
 
     //  console.log(chatid);
 
     res.json(data.rows);
-    console.log(data.rows);
+    // console.log(data.rows);
   } catch (error) {
     console.log(error);
     res.json(error);

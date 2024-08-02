@@ -166,3 +166,21 @@ Input{
 .normal {
   background-color: #e8e8e8;
 }
+
+.datedivide{
+   background-color: #f3f0f0;
+   border-radius: 10px;
+}
+
+.line{
+  border-bottom-width: 3px !important;
+  /* background-color: #fff !important; */
+}
+
+.wholeChat{
+  /* display: flex;
+  flex-direction:column;
+  justify-content: flex-end; */
+
+
+}

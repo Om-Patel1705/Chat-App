@@ -81,6 +81,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
       );
 
       setMessages(data);
+      // console.log(messages);
       setLoading(false);
       socket.emit(`join chat`, selectedChat.chatid);
     } catch (error) {
@@ -118,10 +119,11 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
       const escapedMessage = newMessage.replace(/'/g, "\\'");
       const encrypteMessage = CryptoJS.AES.encrypt(
         JSON.stringify(escapedMessage),
-        process.env.REACT_APP_MESSAGE_SECRET
+        "oiadasdadasdasuygfavbsca09876tgNNdalj"
+        // process.env.REACT_APP_MESSAGE_SECRET
       ).toString();
 
-      // console.log(encrypteMessage);
+      console.log(encrypteMessage);
 
       // const byte = CryptoJS.AES.decrypt(encrypteMessage,process.env.REACT_APP_MESSAGE_SECRET)
 
