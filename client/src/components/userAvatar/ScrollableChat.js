@@ -60,9 +60,9 @@ const ScrollableChat = ({ messages }) => {
         messages.map((m, i) => (
           <>
             {mp.has(i) ? (
-              <Box opacity={1} position="relative" padding="5">
-                <Divider className="line" />
-                <AbsoluteCenter className="datedivide" px="4">
+              <Box opacity={1} position="relative" padding="10" paddingRight="5" paddingLeft="5">
+                <Divider className="line" opacity={1} />
+                <AbsoluteCenter className="datedivide" px="4" >
                   {m.date}
                 </AbsoluteCenter>
               </Box>
@@ -97,7 +97,7 @@ const ScrollableChat = ({ messages }) => {
                     m.senderid === user._id ? "#97d9ff" : "#97f3bb"
                   }`,
                   marginLeft: isSameSenderMargin(messages, m, i, user._id),
-                  marginTop: isSameUser(messages, m, i, user._id) ? 3 : 15,
+                  marginTop: isSameUser(messages, m, i, user._id) ? 3 : 3,
                   marginBottom: isSameUser(messages, m, i, user._id) ? 0 : 0,
                   borderRadius: "10px",
                   padding: "5px 15px",
