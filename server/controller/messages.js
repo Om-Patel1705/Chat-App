@@ -49,5 +49,19 @@ const allMessages = async (req, res) => {
     res.json(error);
   }
 };
-
-module.exports = { addMessage, allMessages };
+const deleteMessage = async (req, res) => {
+    const { chatId,msgid } = req.body;
+    console.log(chatId);
+      try{
+           await pool.query(`DELETE FROM messages WHERE chatid=${msgid}`);
+          const data = await pool.query(
+            `select * from (SELECT id, content, senderid,time, to_char(time , 'HH24:MI') AS time1,to_char(time, 'DD-MM-YYYY') as date , chatid from messages where chatid=${chatId} ) as r1 join users as u on u.id=r1.senderid ORDER BY time`
+          );
+          res.json(data.rows);
+        }
+      catch(err){
+        console.log(err);
+        res.status(500).json({ error: 'An error occurred' });
+      }
+};
+module.exports = { addMessage, allMessages,deleteMessage };

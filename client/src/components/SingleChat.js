@@ -119,8 +119,8 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
       const escapedMessage = newMessage.replace(/'/g, "\\'");
       const encrypteMessage = CryptoJS.AES.encrypt(
         JSON.stringify(escapedMessage),
-        "oiadasdadasdasuygfavbsca09876tgNNdalj"
-        // process.env.REACT_APP_MESSAGE_SECRET
+      
+        process.env.REACT_APP_MESSAGE_SECRET
       ).toString();
 
       console.log(encrypteMessage);

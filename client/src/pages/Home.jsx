@@ -21,6 +21,7 @@ function Home() {
 
   return (
     <Container maxW="xl" centerContent>
+      
     <div className="mainbox">
       <Box
         className="upperbox"
@@ -56,8 +57,10 @@ function Home() {
             </TabPanel>
           </TabPanels>
         </Tabs>
+      <p className="wait">Please wait! It may take a few minutes</p>
       </Box>
       </div>
+
     </Container>
   );
 }
