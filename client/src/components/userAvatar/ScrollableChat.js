@@ -51,7 +51,16 @@ const ScrollableChat = ({ messages }) => {
       messages[i].content = x;
     } catch (err) {}
   }
-
+const handleDeleteMessage= async(chatId,messagesId)=> {
+    // console.log(chatId);
+    try {
+      const response = await axios.post(`${ENDPOINT}/api/delete`, { chatId, messagesId });
+        setChats(response.data.data);
+      // setFetchAgain(!fetchAgain);
+    } catch (err) {
+      console.error(err);
+    }
+  }
   const xx = "     ";
 
   return (
@@ -107,6 +116,14 @@ const ScrollableChat = ({ messages }) => {
               >
                 {m.content}
                 <span>{xx}</span>
+                  <span>
+                <Menu isLazy>
+                   <MenuButton marginLeft='10px'>:</MenuButton>
+                    <MenuList>
+                   <MenuItem onClick={() => handleDeleteMessage(m.chatid,m.id)}>Delete</MenuItem>
+                  </MenuList>
+                </Menu>
+                </span>
                 <span className="time">{m.time1}</span>
               </span>
             </div>
