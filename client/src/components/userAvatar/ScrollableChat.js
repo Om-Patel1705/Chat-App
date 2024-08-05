@@ -44,8 +44,8 @@ const ScrollableChat = ({ messages }) => {
       }
       const byt = CryptoJS.AES.decrypt(
         messages[i].content,
-        // process.env.REACT_APP_MESSAGE_SECRET
-        "oiadasdadasdasuygfavbsca09876tgNNdalj"
+        process.env.REACT_APP_MESSAGE_SECRET
+   
       );
       const x = JSON.parse(byt.toString(CryptoJS.enc.Utf8));
       messages[i].content = x;
