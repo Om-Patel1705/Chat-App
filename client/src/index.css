@@ -192,3 +192,9 @@ Input{
   justify-content: center;
   align-items: center;
 }
+
+
+.divide{
+  border-bottom-width: 3px !important;
+  border-color: #9d9f9f !important;
+}
