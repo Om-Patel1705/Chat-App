@@ -194,8 +194,8 @@ function Signup() {
           onKeyDown={enter}
         />
       </FormControl>
-      <FormControl id="name" isRequired>
-        <FormLabel>Upload Your Image</FormLabel>
+      <FormControl id="name" >
+        <FormLabel>Upload Your Image (Optional)</FormLabel>
         <Input
           type="file"
           p={1.5}
