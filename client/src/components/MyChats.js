@@ -1,5 +1,5 @@
 import { AddIcon } from "@chakra-ui/icons";
-import { Box, Stack, Text } from "@chakra-ui/layout";
+import { Box, Stack, Text ,Divider } from "@chakra-ui/layout";
 import { useToast } from "@chakra-ui/toast";
 import axios from "axios";
 import { Avatar, Image } from "@chakra-ui/react";
@@ -191,6 +191,7 @@ const MyChats = ({ fetchAgain, setFetchAgain }) => {
                     )}
                   </Box>
                 </Box>
+                <Divider className="divide"/>
               </>
             ))}
           </Stack>
