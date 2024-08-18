@@ -7,7 +7,7 @@ const dotenv = require("dotenv");
 const userRoutes=require("./Routes/userRoutes");
 const chatRoutes=require("./Routes/chatRoutes");
 const messageRoutes=require("./Routes/messageRoutes");
-const pool = require("./config/db");
+const pool = require("./config/db"); 
 
 const authUser = require("./controller/authUser");
 const { registerUser } = require("./controller/registerUser");
