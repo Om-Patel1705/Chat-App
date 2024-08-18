@@ -18,8 +18,8 @@ import { useNavigate } from "react-router-dom";
 import ImageB from "./chat-bubble.png";
 import imageCompression from "browser-image-compression";
 
-const ENDPOINT = `http://localhost:3001`;
-// const ENDPOINT = "https://chat-app-j34h.onrender.com";
+// const ENDPOINT = `http://localhost:3001`;
+const ENDPOINT = "https://chat-app-j34h.onrender.com";
 
 function Signup() {
   const [name, setname] = useState("");
