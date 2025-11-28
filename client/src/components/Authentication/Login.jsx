@@ -11,7 +11,8 @@ import {
 import "../../index.css";
 import { useToast } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
-
+const ENDPOINT = process.env.REACT_APP_SERVERURL || "http://localhost:3001";
+console.log("Server URL is:", process.env.REACT_APP_SERVERURL);
 function Login() {
   const [email, setemail] = useState("");
   const [password, setpassword] = useState("");
@@ -44,7 +45,7 @@ function Login() {
     }
 
     try {
-      const response = await fetch("https://chat-app-j34h.onrender.com/api/user/login", {
+      const response = await fetch(`${ENDPOINT}/api/user/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

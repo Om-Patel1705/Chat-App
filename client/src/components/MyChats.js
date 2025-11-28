@@ -16,7 +16,7 @@ import GroupChatModal from "./miscellaneous/GroupChatModal.js";
 import CryptoJS from "crypto-js";
 
 // const ENDPOINT = `http://localhost:3001`;
-const ENDPOINT = `https://chat-app-j34h.onrender.com`;
+const ENDPOINT = process.env.REACT_APP_SERVERURL || "http://localhost:3001";
 
 const MyChats = ({ fetchAgain, setFetchAgain }) => {
   const { selectedChat, setSelectedChat, user, chats, setChats } = ChatState();

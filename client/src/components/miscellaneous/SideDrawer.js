@@ -38,7 +38,7 @@ import { dotStream } from "ldrs";
 
 dotStream.register();
 // const ENDPOINT = `http://localhost:3001`;
-const ENDPOINT = "https://chat-app-j34h.onrender.com";
+const ENDPOINT = process.env.REACT_APP_SERVERURL || "http://localhost:3001";
 var socket, selectedChatCompare;
 
 function SideDrawer({ fetchAgain, setFetchAgain }) {
