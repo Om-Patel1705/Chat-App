@@ -19,7 +19,7 @@ import ImageB from "./chat-bubble.png";
 import imageCompression from "browser-image-compression";
 
 // const ENDPOINT = `http://localhost:3001`;
-const ENDPOINT = "https://chat-app-j34h.onrender.com";
+const ENDPOINT = process.env.REACT_APP_SERVERURL || "http://localhost:3001";
 
 function Signup() {
   const [name, setname] = useState("");

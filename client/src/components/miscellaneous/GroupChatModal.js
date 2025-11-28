@@ -20,7 +20,7 @@ import UserListItem from "../userAvatar/userListItem";
 import axios from "axios";
 import { io } from "socket.io-client";
 
-const ENDPOINT = "https://chat-app-j34h.onrender.com";
+const ENDPOINT = process.env.REACT_APP_SERVERURL || "http://localhost:3001";
 var socket, selectedChatCompare;
 
 const GroupChatModal = ({ children, fetchAgain, setFetchAgain }) => {

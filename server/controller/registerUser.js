@@ -9,12 +9,14 @@ const registerUser = asyncHandler(async (req, res) => {
   var { name, email, password, preview } = req.body;
 
   try {
-    // console.log(preview);
+    console.log(preview);
 
+    if(preview){
     pic = await cloudinary.uploader.upload(preview, {
       folder: "/user_DP",
     });
-
+  }
+ 
     if (!name || !email || !password) {
       res.status(400).send(JSON.stringify("Please Input all the Feilds"));
       console.error("Please Input all the Feilds");
@@ -39,7 +41,7 @@ const registerUser = asyncHandler(async (req, res) => {
     //  const user = await User.create({name,email,password,pic});
     try {
       // console.log(pic.url);
-      if (pic) {
+      if (preview && pic) {
         await pool.query(
           "insert into users (username, email, password,pic) values  ($1,$2,$3,$4)",
           [name, email, password, pic.url]
@@ -54,7 +56,7 @@ const registerUser = asyncHandler(async (req, res) => {
       const user = await pool.query(
         `select * from users where username='${name}'`
       );
-      // console.log(user.rows);
+      console.log(user.rows);
       res.status(201).json({
         _id: user.rows[0].id,
         name: user.rows[0].username,

@@ -23,7 +23,7 @@ import axios from "axios";
 import UserListItem from "../userAvatar/userListItem";
 
 // const ENDPOINT = `http://localhost:3001`;
-const ENDPOINT = `https://chat-app-j34h.onrender.com`;
+const ENDPOINT = process.env.REACT_APP_SERVERURL || "http://localhost:3001";
 
 const UpdateGroupChatModal = ({fetchMessages, fetchAgain, setFetchAgain }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
