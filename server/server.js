@@ -12,21 +12,47 @@ const pool = require("./config/db");
 const authUser = require("./controller/authUser");
 const { registerUser } = require("./controller/registerUser");
 
-app.use(cors());
 app.use(express.json());
-
 const server = http.createServer(app); 
-
 dotenv.config();
+// put this near top, after dotenv.config()
+const allowedOrigins = [
+  "https://chat-app-psi-roan.vercel.app", // your Vercel frontend (if still used)
+  "http://localhost:3000",                // local dev
+  "http://127.0.0.1:3000",
+  "http://3.109.155.93:3000",             // EC2 frontend IP
+  "http://3.109.155.93"                   // sometimes origin may be without port
+];
 
+// Express CORS middleware (returns request origin if in list)
+app.use(cors({
+  origin: function(origin, callback){
+    // allow non-browser requests like curl/postman (no origin)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error("CORS not allowed"), false);
+    }
+  },
+  credentials: true,
+}));
+
+// Socket.io CORS: allow same list
 const io = new Server(server, {
   cors: {
-    // origin: "https://chat-app-psi-roan.vercel.app", 
-    origin: "http://3.109.155.93:3000", 
-  //  origin: "http://localhost:3000",
+    origin: function(origin, callback) {
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.indexOf(origin) !== -1) {
+        callback(null, true);
+      } else {
+        callback(new Error("CORS not allowed by Socket.IO"), false);
+      }
+    },
     methods: ["GET", "POST"],
-  }, 
-}); 
+    credentials: true
+  },
+});
 
 io.on("connection", (socket) => {
   console.log(`User Connected: ${socket.id}`);
