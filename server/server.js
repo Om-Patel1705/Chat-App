@@ -20,8 +20,8 @@ const allowedOrigins = [
   "https://chat-app-psi-roan.vercel.app", // your Vercel frontend (if still used)
   "http://localhost:3000",                // local dev
   "http://127.0.0.1:3000",
-  "http://3.109.155.93:3000",             // EC2 frontend IP
-  "http://3.109.155.93"                   // sometimes origin may be without port
+  process.env.FRONTEND_URL,                // EC2 frontend IP
+  "http://47.129.215.82.93"                   // sometimes origin may be without port
 ];
 
 // Express CORS middleware (returns request origin if in list)
