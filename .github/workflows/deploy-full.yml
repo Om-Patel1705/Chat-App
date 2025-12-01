@@ -21,6 +21,9 @@ jobs:
           echo "HOST=${DEPLOY_HOST:+SET}"
           echo "USER=${DEPLOY_USER:+SET}"
           echo "PATH=${DEPLOY_PATH:+SET}"
+          echo "HOST length: ${#DEPLOY_HOST}"
+          echo "USER length: ${#DEPLOY_USER}"
+
         env:
           DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
           DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
