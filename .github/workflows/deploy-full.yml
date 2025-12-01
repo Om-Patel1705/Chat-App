@@ -15,6 +15,17 @@ jobs:
       DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
 
     steps:
+
+      - name: Check secrets
+        run: |
+          echo "HOST=${DEPLOY_HOST:+SET}"
+          echo "USER=${DEPLOY_USER:+SET}"
+          echo "PATH=${DEPLOY_PATH:+SET}"
+        env:
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+          DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
+          
       - name: Checkout repo
         uses: actions/checkout@v4
 
