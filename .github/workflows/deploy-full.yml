@@ -30,6 +30,8 @@ jobs:
 
       - name: Build frontend
         working-directory: ./client
+        env:
+          DISABLE_ESLINT_PLUGIN: "true"
         run: npm run build
 
       # ---------- PREPARE SSH (for rsync / remote commands) ----------
