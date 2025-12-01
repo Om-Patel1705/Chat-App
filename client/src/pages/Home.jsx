@@ -33,7 +33,7 @@ function Home() {
         textAlign={"center"}
       >
         {/* fontFamily={"work sans"} */}
-        <Text fontSize={"3xl"} fontFamily={"Nunito"} >Chat-App-Cloud-2</Text>
+        <Text fontSize={"3xl"} fontFamily={"Nunito"} >Chat-App-Cloud-Uploaded</Text>
       </Box>
       <Divider orientation='horizontal' />
       <Box
