@@ -57,7 +57,7 @@ function Home() {
             </TabPanel>
           </TabPanels>
         </Tabs>
-      <p className="wait">Please wait! It may take a few minutes</p>
+      <p className="wait">Please wait! It may take a few minutes...</p>
       </Box>
       </div>
 
