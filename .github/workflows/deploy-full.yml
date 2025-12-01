@@ -54,10 +54,15 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.DEPLOY_SSH_KEY }}
 
-      - name: Ensure remote build folder exists (creates path if missing)
-        run: |
-          ssh -o StrictHostKeyChecking=no ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} "mkdir -p $DEPLOY_PATH/client && chown -R ${{ secrets.DEPLOY_USER }}:$({{ secrets.DEPLOY_USER }}) $DEPLOY_PATH || true"
-        # Note: owner fix may be unnecessary; adjust if permissions are different.
+      - name: Ensure remote build folder exists (appleboy)
+        uses: appleboy/ssh-action@v0.1.8
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          script: |
+            mkdir -p "${{ secrets.DEPLOY_PATH }}/client"
+            chown -R "${{ secrets.DEPLOY_USER }}:${{ secrets.DEPLOY_USER }}" "${{ secrets.DEPLOY_PATH }}" || true
 
       # ---------- RSYNC FRONTEND BUILD ----------
       - name: Rsync build to EC2
