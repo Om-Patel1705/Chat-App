@@ -33,7 +33,7 @@ function Home() {
         textAlign={"center"}
       >
         {/* fontFamily={"work sans"} */}
-        <Text fontSize={"3xl"} fontFamily={"Nunito"} >Chat-App-Cloud</Text>
+        <Text fontSize={"3xl"} fontFamily={"Nunito"} >Chat-App-Cloud-2</Text>
       </Box>
       <Divider orientation='horizontal' />
       <Box
@@ -57,7 +57,7 @@ function Home() {
             </TabPanel>
           </TabPanels>
         </Tabs>
-      <p className="wait">Please wait! It may take a few minutes</p>
+      <p className="wait">Please wait! It may take a few minutes...</p>
       </Box>
       </div>
 
