@@ -1,0 +1,101 @@
+name: CI/CD - Build frontend & deploy full app to EC2
+
+# Runs on pushes to main (change branch as needed)
+on:
+  push:
+    branches: [ main ]
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    env:
+      DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      # ---------- FRONTEND BUILD ----------
+      - name: Setup Node (for frontend build)
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install frontend deps
+        working-directory: ./client
+        run: npm ci
+
+      - name: Build frontend
+        working-directory: ./client
+        run: npm run build
+
+      # ---------- PREPARE SSH (for rsync / remote commands) ----------
+      - name: Start ssh-agent and add private key
+        uses: webfactory/ssh-agent@v0.8.1
+        with:
+          ssh-private-key: ${{ secrets.DEPLOY_SSH_KEY }}
+
+      - name: Ensure remote build folder exists (creates path if missing)
+        run: |
+          ssh -o StrictHostKeyChecking=no ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} "mkdir -p $DEPLOY_PATH/client && chown -R ${{ secrets.DEPLOY_USER }}:$({{ secrets.DEPLOY_USER }}) $DEPLOY_PATH || true"
+        # Note: owner fix may be unnecessary; adjust if permissions are different.
+
+      # ---------- RSYNC FRONTEND BUILD ----------
+      - name: Rsync build to EC2
+        run: |
+          rsync -e "ssh -o StrictHostKeyChecking=no" -avz --delete ./client/build/ ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:${{ secrets.DEPLOY_PATH }}/client/build/
+
+      # ---------- RESTART FRONTEND (pm2 serve) ----------
+      - name: Restart frontend on server (pm2)
+        run: |
+          ssh -o StrictHostKeyChecking=no ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} << 'EOF'
+            set -e
+            DEPLOY_PATH=${{ secrets.DEPLOY_PATH }}
+            if [ ! -f "$DEPLOY_PATH/client/build/index.html" ]; then
+              echo "ERROR: build not found at $DEPLOY_PATH/client/build/index.html"
+              ls -la $DEPLOY_PATH/client/build || true
+              exit 1
+            fi
+            # restart frontend process - adjust command if you use a different method
+            pm2 delete react-frontend || true
+            pm2 start "serve -s ${DEPLOY_PATH}/client/build -l 3000" --name react-frontend
+            pm2 save
+          EOF
+
+      # ---------- DEPLOY BACKEND (git pull, npm ci, pm2 restart) ----------
+      - name: Deploy backend on server (git pull + npm ci + pm2 restart)
+        run: |
+          ssh -o StrictHostKeyChecking=no ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} << 'EOF'
+            set -e
+            DEPLOY_PATH=${{ secrets.DEPLOY_PATH }}
+            cd $DEPLOY_PATH
+
+            # If repo not cloned on server, clone it
+            if [ ! -d ".git" ]; then
+              git clone https://github.com/${{ github.repository }}.git .
+            else
+              git fetch --all
+              git reset --hard origin/main
+            fi
+
+            # backend deploy
+            cd server
+            npm ci
+            pm2 restart chat-backend || pm2 start server.js --name chat-backend
+            pm2 save
+          EOF
+
+      # ---------- SMOKE TEST ----------
+      - name: Smoke tests (frontend + backend)
+        run: |
+          ssh -o StrictHostKeyChecking=no ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} << 'EOF'
+            set -e
+            # frontend check
+            curl -fsS http://localhost:3000/ -o /dev/null
+            # backend health endpoint (make /health or / exists)
+            curl -fsS http://localhost:3001/health -o /dev/null || true
+            echo "Smoke tests executed"
+          EOF
